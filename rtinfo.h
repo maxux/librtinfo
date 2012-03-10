@@ -10,6 +10,7 @@
 	#define LOADAVG_FILE	"/proc/loadavg"
 	#define CPU_FILE	"/proc/stat"
 	#define NET_FILE	"/proc/net/dev"
+	#define UPTIME_FILE	"/proc/uptime"
 	#define BATTERY_PATH	"/sys/class/power_supply/" BATTERY_NAME
 	
 	#include <stdint.h>
@@ -87,6 +88,12 @@
 		char ip[16];		/* IP Address in char */
 		
 	} rtinfo_network_legacy_t;
+	
+	/* Uptime Structure */
+	typedef struct rtinfo_uptime_t {
+		uint32_t uptime;
+		
+	} rtinfo_uptime_t;
 
 	/* Functions prototypes */
 	/* Initialize CPU structure (required to use CPU) */
@@ -111,6 +118,9 @@
 	
 	/* Return a (struct tm) pointer to the current local time */
 	struct tm * rtinfo_get_time();
+	
+	/* Update uptime structure */
+	rtinfo_uptime_t * rtinfo_get_uptime(rtinfo_uptime_t *uptime);
 	
 	float rtinfo_version();
 #endif
