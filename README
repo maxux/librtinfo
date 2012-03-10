@@ -1,0 +1,58 @@
+   librtinfo
+===============
+
+	librtinfo is a small lib (about 400 lines of code) able to write basic data structures easy-to-use with system informations
+
+Dependencies
+===========
+
+	linrtinfo just depends on linux headers
+
+How to use it
+=============
+
+	Data presentation
+	-----------------
+	
+		Data structures are formated like:
+			rtinfo_{type}_t
+			
+			Ex: rtinfo_memory_t
+	
+	
+	Functions presentation
+	----------------------
+	
+		Functions to manage them are formated like:
+			rtinfo_{action}_{type}
+			
+			Ex: rtinfo_get_memory
+		
+		Some functions (like cpu and memory) require an initialization:
+			rtinfo_init_{type}
+			
+			Ex: rtinfo_init_cpu
+	
+	Arguments
+	---------
+	
+		Inits functions need an integer as argument, returning count of element found
+		Getter functions need an pointer to the data structure to use
+		"mk" functions need some differents arguments, please read rtinfo.h for more informations.
+	
+	
+	Compilation
+	-----------
+	
+		Just compile your code using -lrtinfo
+
+Bug ?
+=====
+
+	If you find a bug or have any suggestion, please send me a patch/message/anything else to
+		root@maxux.net
+
+Contributors
+============
+
+	mortecouille, willubuntu
