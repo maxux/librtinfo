@@ -94,6 +94,12 @@
 		uint32_t uptime;
 		
 	} rtinfo_uptime_t;
+	
+	/* System Temperatures */
+	typedef struct rtinfo_temp_t {
+		uint16_t cpu_average;
+		
+	} rtinfo_temp_t;
 
 	/* Functions prototypes */
 	/* Initialize CPU structure (required to use CPU) */
@@ -109,6 +115,7 @@
 	rtinfo_memory_t * rtinfo_get_memory(rtinfo_memory_t *memory);
 	rtinfo_loadagv_t * rtinfo_get_loadavg(rtinfo_loadagv_t *load);
 	rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery);
+	rtinfo_temp_t * rtinfo_get_temp(rtinfo_temp_t *temp);
 	
 	/* Initialize Network structure (required to use network) */
 	rtinfo_network_t * rtinfo_init_network(int *nbiface);

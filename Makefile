@@ -26,3 +26,14 @@ clean:
 
 mrproper: clean
 	rm -fv $(LIBFILE) $(LIB).so*
+
+install:
+	mkdir -p $(PREFIX)/lib
+	cp -Pf *.so* $(PREFIX)/lib/
+	ldconfig
+	mkdir -p $(PREFIX)/include
+	cp -f rtinfo.h $(PREFIX)/include/
+
+uninstall:
+	rm -f $(PREFIX)/lib/$(LIB).*
+	rm -f $(PREFIX)/include/rtinfo.h

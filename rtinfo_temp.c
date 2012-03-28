@@ -22,52 +22,41 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <stropts.h>
 #include <unistd.h>
+#include <glob.h>
 #include "misc.h"
 #include "rtinfo.h"
 
-rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery) {
+rtinfo_temp_t * rtinfo_get_temp(rtinfo_temp_t *temp) {
 	FILE *fp;
+	glob_t globbuf;
 	char data[32];
+	size_t i;
+	uint64_t value = 0;
 
-	/* Checking for battery presence */
-	fp = fopen(BATTERY_PATH "/present", "r");
-	if(!fp) {
-		perror(BATTERY_PATH);
-		battery->load = -1;
-		return battery;
+	globbuf.gl_offs = 1;
+	glob("/sys/devices/platform/coretemp.0/temp*_input", GLOB_NOSORT, NULL, &globbuf);
+	
+	if(globbuf.gl_pathc == 0) {
+		temp->cpu_average = 0;
+		return temp;
 	}
 	
-	fclose(fp);
+	for(i = 0; i < globbuf.gl_pathc; i++) {
+		fp = fopen(globbuf.gl_pathv[i], "r");
+		if(!fp) {
+			perror(globbuf.gl_pathv[i]);
+			return NULL;
+		}
+		
+		if(fgets(data, sizeof(data), fp))
+			value += atoi(data);
+		
+		fclose(fp);
+	}
+	
+	/* Divide per 1000, and divide by core numbers, to get an average */
+	temp->cpu_average = value / (globbuf.gl_pathc * 1000);
 
-	/* Reading current charge */
-	if(!file_get(BATTERY_PATH "/charge_now", data, sizeof(data)))
-		return NULL;
-	
-	battery->charge_now = atol(data);
-	
-	/* Reading full_charge */
-	if(!file_get(BATTERY_PATH "/charge_full", data, sizeof(data)))
-		return NULL;
-	
-	battery->charge_full = atol(data);
-	
-	/* Reading status */
-	if(!file_get(BATTERY_PATH "/status", data, sizeof(data)))
-		return NULL;
-	
-	if(!strncmp(data, "Full", 4))
-		battery->status = FULL;
-	
-	else if(!strncmp(data, "Charging", 4))
-		battery->status = CHARGING;
-	
-	else if(!strncmp(data, "Discharging", 4))
-		battery->status = DISCHARGING;
-	
-	/* Calculating usage */
-	battery->load = ((float) battery->charge_now / battery->charge_full) * 100;
-	
-	return battery;
+	return temp;
 }
