@@ -34,7 +34,7 @@ rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery) {
 	/* Checking for battery presence */
 	fp = fopen(BATTERY_PATH "/present", "r");
 	if(!fp) {
-		perror(BATTERY_PATH);
+		// perror(BATTERY_PATH);
 		battery->load = -1;
 		return battery;
 	}
