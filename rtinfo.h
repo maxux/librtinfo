@@ -1,7 +1,7 @@
 #ifndef __SYSINFO_H
 	#define __SYSINFO_H
 	
-	#define LIBRTINFO_DEBUG			1		/* Enable lib debug message */
+	#define LIBRTINFO_DEBUG			0		/* Enable lib debug message */
 	#define LIBRTINFO_HDDTEMP_HOST		"127.0.0.1" 	/* Should always be localhost */
 	#define LIBRTINFO_HDDTEMP_PORT		7634
 	
