@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <unistd.h>
 #include "misc.h"
 #include "rtinfo.h"
 
@@ -118,6 +119,8 @@ rtinfo_temp_hdd_t * rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *hddtemp) {
 	
 	hddtemp->hdd_average = __rtinfo_internal_hddtemp_parse(buffer, &peak);
 	hddtemp->peak 	     = peak;
+	
+	close(sockfd);
 	
 	return hddtemp;
 }
