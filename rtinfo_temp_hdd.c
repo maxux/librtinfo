@@ -87,7 +87,7 @@ uint16_t __rtinfo_internal_hddtemp_parse(char *buffer, unsigned int *peak) {
 				value += this;
 				disks++;
 				
-			} else printf("[-] librtinfo hddtemp parser: error: %s\n", str);
+			} else if(LIBRTINFO_DEBUG) printf("[-] librtinfo hddtemp parser: error: %s\n", str);
 			
 			if(!(str = strstr(str, "||")))
 				break;
