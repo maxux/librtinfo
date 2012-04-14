@@ -1,0 +1,5 @@
+TODO
++ ipmi cpu temp support
++ critical cpu temp support
++ battery energy_* current_* voltage_* support
+  (http://paste.maxux.net/227624331)

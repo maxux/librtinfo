@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * system memory usage support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,10 +33,10 @@ rtinfo_memory_t * rtinfo_get_memory(rtinfo_memory_t *memory) {
 	char data[32], missing;
 	unsigned int _memfree = 0, _buffers = 0, _cached = 0;
 
-	fp = fopen(MEMORY_FILE, "r");
+	fp = fopen(LIBRTINFO_MEMORY_FILE, "r");
 
 	if(!fp) {
-		perror(MEMORY_FILE);
+		perror(LIBRTINFO_MEMORY_FILE);
 		exit(1);
 	}
 

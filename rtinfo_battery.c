@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * acpi battery support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,15 +24,41 @@
 #include <stdint.h>
 #include <stropts.h>
 #include <unistd.h>
+#include <glob.h>
 #include "misc.h"
 #include "rtinfo.h"
 
-rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery) {
+rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name) {
 	FILE *fp;
 	char data[32];
+	char path[128], init_path[100];
+	glob_t globbuf;
+	
+	/* Auto-Name Search */
+	if(!name) {
+		globbuf.gl_offs = 1;
+		glob(LIBRTINFO_BATTERY_PATH "/BAT*", GLOB_NOSORT, NULL, &globbuf);
+		
+		/* No battery found / TODO: Multiple batteries found (not supported yet) */
+		if(globbuf.gl_pathc != 1) {
+			battery->load = -1;
+			return battery;
+			
+		}
+		
+		/* Init Path: Glob found */
+		strcpy(init_path, globbuf.gl_pathv[0]);
+	
+	/* Init Path: BATTERY_PATH/name */
+	} else sprintf(init_path, "%s/%s", LIBRTINFO_BATTERY_PATH, name);
+	
+	if(LIBRTINFO_DEBUG)
+		printf("[+] Init Path: %s\n", init_path);
 
 	/* Checking for battery presence */
-	fp = fopen(BATTERY_PATH "/present", "r");
+	sprintf(path, "%s/present", init_path);
+	
+	fp = fopen(path, "r");
 	if(!fp) {
 		// perror(BATTERY_PATH);
 		battery->load = -1;
@@ -42,19 +68,23 @@ rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery) {
 	fclose(fp);
 
 	/* Reading current charge */
-	if(!file_get(BATTERY_PATH "/charge_now", data, sizeof(data)))
+	sprintf(path, "%s/charge_now", init_path);
+	if(!file_get(path, data, sizeof(data)))
 		return NULL;
 	
 	battery->charge_now = atol(data);
 	
 	/* Reading full_charge */
-	if(!file_get(BATTERY_PATH "/charge_full", data, sizeof(data)))
+	sprintf(path, "%s/charge_full", init_path);
+	if(!file_get(path, data, sizeof(data)))
 		return NULL;
 	
 	battery->charge_full = atol(data);
 	
 	/* Reading status */
-	if(!file_get(BATTERY_PATH "/status", data, sizeof(data)))
+	sprintf(path, "%s/status", init_path);
+	
+	if(!file_get(path, data, sizeof(data)))
 		return NULL;
 	
 	if(!strncmp(data, "Full", 4))

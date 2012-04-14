@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * current system date/time support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify

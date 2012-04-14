@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * cpu temerature support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,10 @@
 #include "misc.h"
 #include "rtinfo.h"
 
-rtinfo_temp_t * rtinfo_get_temp(rtinfo_temp_t *temp) {
+/*
+ *  Coretemp support
+ */
+rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 	FILE *fp;
 	glob_t globbuf;
 	char data[32];
@@ -39,6 +42,7 @@ rtinfo_temp_t * rtinfo_get_temp(rtinfo_temp_t *temp) {
 	
 	if(globbuf.gl_pathc == 0) {
 		temp->cpu_average = 0;
+		temp->critical    = 0;
 		return temp;
 	}
 	
@@ -54,6 +58,23 @@ rtinfo_temp_t * rtinfo_get_temp(rtinfo_temp_t *temp) {
 		
 		fclose(fp);
 	}
+	
+	/* Reading Critital value */
+	glob("/sys/devices/platform/coretemp.0/temp*_crit", GLOB_NOSORT, NULL, &globbuf);
+	if(globbuf.gl_pathc != 0) {	
+		fp = fopen(globbuf.gl_pathv[0], "r");
+		if(fp) {
+			if(fgets(data, sizeof(data), fp))
+				temp->critical = atoi(data) / 1000;
+				
+		} else {
+			perror(globbuf.gl_pathv[0]);
+			temp->critical = 0;
+		}
+				
+		fclose(fp);
+		
+	} else temp->critical = 0;
 	
 	/* Divide per 1000, and divide by core numbers, to get an average */
 	temp->cpu_average = value / (globbuf.gl_pathc * 1000);

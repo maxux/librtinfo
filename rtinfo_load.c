@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * unix load average support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ rtinfo_loadagv_t * rtinfo_get_loadavg(rtinfo_loadagv_t *load) {
 	load->load[1] = -1;
 	load->load[2] = -1;
 	
-	if(!file_get(LOADAVG_FILE, data, sizeof(data)))
+	if(!file_get(LIBRTINFO_LOADAVG_FILE, data, sizeof(data)))
 		return NULL;
 	
 	sscanf(data, "%f %f %f", &load->load[0], &load->load[1], &load->load[2]);

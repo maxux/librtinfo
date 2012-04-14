@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * network interfaces statistics support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -39,10 +39,10 @@ rtinfo_network_t * rtinfo_init_network(int *nbiface) {
 	rtinfo_network_t *net;
 	int i;
 	
-	fp = fopen(NET_FILE, "r");
+	fp = fopen(LIBRTINFO_NET_FILE, "r");
 
 	if(!fp) {
-		perror(NET_FILE);
+		perror(LIBRTINFO_NET_FILE);
 		exit(1);
 	}
 
@@ -96,10 +96,10 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 	char data[256];
 	short i = 0;
 
-	fp = fopen(NET_FILE, "r");
+	fp = fopen(LIBRTINFO_NET_FILE, "r");
 
 	if(!fp) {
-		perror(NET_FILE);
+		perror(LIBRTINFO_NET_FILE);
 		exit(1);
 	}
 

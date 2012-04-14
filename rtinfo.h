@@ -1,17 +1,17 @@
 #ifndef __SYSINFO_H
 	#define __SYSINFO_H
 	
-	/* User defines */
-	#define BATTERY_NAME		"BAT1"
-	#define UPDATE_INTERVAL		1000000
+	#define LIBRTINFO_DEBUG			1		/* Enable lib debug message */
+	#define LIBRTINFO_HDDTEMP_HOST		"127.0.0.1" 	/* Should always be localhost */
+	#define LIBRTINFO_HDDTEMP_PORT		7634
 	
 	/* System defines */
-	#define MEMORY_FILE	"/proc/meminfo"
-	#define LOADAVG_FILE	"/proc/loadavg"
-	#define CPU_FILE	"/proc/stat"
-	#define NET_FILE	"/proc/net/dev"
-	#define UPTIME_FILE	"/proc/uptime"
-	#define BATTERY_PATH	"/sys/class/power_supply/" BATTERY_NAME
+	#define LIBRTINFO_MEMORY_FILE	"/proc/meminfo"
+	#define LIBRTINFO_LOADAVG_FILE	"/proc/loadavg"
+	#define LIBRTINFO_CPU_FILE	"/proc/stat"
+	#define LIBRTINFO_NET_FILE	"/proc/net/dev"
+	#define LIBRTINFO_UPTIME_FILE	"/proc/uptime"
+	#define LIBRTINFO_BATTERY_PATH	"/sys/class/power_supply/"
 	
 	#include <stdint.h>
 	
@@ -76,7 +76,7 @@
 		struct rtinfo_network_node_t previous;	/* Copy of previous bytes transfered over the interface */
 		int64_t up_rate;		/* Upload rate (in b/s) */
 		int64_t down_rate;		/* Download rate (in b/s) */
-		char ip[16];		/* IP Address in char */
+		char ip[16];			/* IP Address in char */
 		
 	} rtinfo_network_t;
 
@@ -85,7 +85,7 @@
 		struct rtinfo_network_node_t current;	/* Number of bytes transfered over the interface */
 		int64_t up_rate;		/* Upload rate (in b/s) */
 		int64_t down_rate;		/* Download rate (in b/s) */
-		char ip[16];		/* IP Address in char */
+		char ip[16];			/* IP Address in char */
 		
 	} rtinfo_network_legacy_t;
 	
@@ -96,10 +96,18 @@
 	} rtinfo_uptime_t;
 	
 	/* System Temperatures */
-	typedef struct rtinfo_temp_t {
+	typedef struct rtinfo_temp_cpu_t {
+		uint16_t critical;
 		uint16_t cpu_average;
 		
-	} rtinfo_temp_t;
+	} rtinfo_temp_cpu_t;
+	
+	/* HDD Temp */
+	typedef struct rtinfo_temp_hdd_t {
+		uint16_t peak;
+		uint16_t hdd_average;
+		
+	} rtinfo_temp_hdd_t;
 
 	/* Functions prototypes */
 	/* Initialize CPU structure (required to use CPU) */
@@ -114,8 +122,9 @@
 	/* Write structure with current values */
 	rtinfo_memory_t * rtinfo_get_memory(rtinfo_memory_t *memory);
 	rtinfo_loadagv_t * rtinfo_get_loadavg(rtinfo_loadagv_t *load);
-	rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery);
-	rtinfo_temp_t * rtinfo_get_temp(rtinfo_temp_t *temp);
+	rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name);
+	rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp);
+	rtinfo_temp_hdd_t * rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *temp);
 	
 	/* Initialize Network structure (required to use network) */
 	rtinfo_network_t * rtinfo_init_network(int *nbiface);

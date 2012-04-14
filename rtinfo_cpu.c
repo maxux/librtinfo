@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * cpu statistics usage support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -35,10 +35,10 @@ rtinfo_cpu_t * rtinfo_init_cpu(int *nbcpu) {
 	rtinfo_cpu_t *cpu;
 	int i;
 	
-	fp = fopen(CPU_FILE, "r");
+	fp = fopen(LIBRTINFO_CPU_FILE, "r");
 
 	if(!fp) {
-		perror(CPU_FILE);
+		perror(LIBRTINFO_CPU_FILE);
 		exit(1);
 	}
 
@@ -75,10 +75,10 @@ rtinfo_cpu_t * rtinfo_get_cpu(rtinfo_cpu_t *cpu, int nbcpu) {
 	char data[256];
 	short i = 0, j = 0;
 
-	fp = fopen(CPU_FILE, "r");
+	fp = fopen(LIBRTINFO_CPU_FILE, "r");
 
 	if(!fp) {
-		perror(CPU_FILE);
+		perror(LIBRTINFO_CPU_FILE);
 		exit(1);
 	}
 

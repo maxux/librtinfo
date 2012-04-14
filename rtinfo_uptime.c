@@ -1,5 +1,5 @@
 /*
- * librtinfo is a small library for Linux for retreive some system status monitor
+ * system uptime support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ rtinfo_uptime_t * rtinfo_get_uptime(rtinfo_uptime_t *uptime) {
 	/* Init Load */
 	uptime->uptime = 0;
 	
-	if(!file_get(UPTIME_FILE, data, sizeof(data)))
+	if(!file_get(LIBRTINFO_UPTIME_FILE, data, sizeof(data)))
 		return NULL;
 	
 	sscanf(data, "%" SCNu32, &uptime->uptime);
