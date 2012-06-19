@@ -43,11 +43,11 @@ rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name) {
 		if(globbuf.gl_pathc != 1) {
 			battery->load = -1;
 			return battery;
-			
 		}
 		
 		/* Init Path: Glob found */
 		strcpy(init_path, globbuf.gl_pathv[0]);
+		globfree(&globbuf);
 	
 	/* Init Path: BATTERY_PATH/name */
 	} else sprintf(init_path, "%s/%s", LIBRTINFO_BATTERY_PATH, name);

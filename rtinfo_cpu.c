@@ -52,6 +52,8 @@ rtinfo_cpu_t * rtinfo_init_cpu(int *nbcpu) {
 		*nbcpu += 1;
 	}
 	
+	fclose(fp);
+	
 	/* Allocating */
 	cpu = (rtinfo_cpu_t*) malloc(sizeof(rtinfo_cpu_t) * *nbcpu);
 	if(!cpu)

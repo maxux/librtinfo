@@ -59,6 +59,8 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 		fclose(fp);
 	}
 	
+	globfree(&globbuf);
+	
 	/* Reading Critital value */
 	glob("/sys/devices/platform/coretemp.0/temp*_crit", GLOB_NOSORT, NULL, &globbuf);
 	if(globbuf.gl_pathc != 0) {	
@@ -75,6 +77,8 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 		fclose(fp);
 		
 	} else temp->critical = 0;
+	
+	globfree(&globbuf);
 	
 	/* Divide per 1000, and divide by core numbers, to get an average */
 	temp->cpu_average = value / (globbuf.gl_pathc * 1000);
