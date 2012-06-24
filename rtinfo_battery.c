@@ -106,6 +106,8 @@ rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name) {
 		}
 	}
 	
+	fclose(fp);
+	
 	/* Calculating usage */
 	battery->load = ((float) battery->charge_now / battery->charge_full) * 100;
 	
