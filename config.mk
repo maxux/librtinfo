@@ -2,7 +2,7 @@
 PREFIX  = /usr/local
 LIB	= librtinfo
 MAJOR	= 3
-VERSION = $(MAJOR).40
+VERSION = $(MAJOR).41
 
 CFLAGS  = -fpic -W -Wall -O2 -pipe -ansi -pedantic -std=gnu99 -DVERSION=$(VERSION)
 LDFLAGS = -shared -Wl,-soname,$(LIB).so.$(MAJOR)

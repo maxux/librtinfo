@@ -50,7 +50,8 @@
 	typedef enum info_battery_status_t {
 		FULL,
 		CHARGING,
-		DISCHARGING
+		DISCHARGING,
+		BATTERY_ERROR
 		
 	} rtinfo_battery_status_t;
 	

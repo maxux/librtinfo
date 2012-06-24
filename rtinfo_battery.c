@@ -28,9 +28,22 @@
 #include "misc.h"
 #include "rtinfo.h"
 
+rtinfo_battery_status_t __rtinfo_internal_battery_getstatus(char *data) {
+	if(!strncmp(data, "Full", 4))
+		return FULL;
+	
+	else if(!strncmp(data, "Charging", 4))
+		return CHARGING;
+	
+	else if(!strncmp(data, "Discharging", 4))
+		return DISCHARGING;
+	
+	return BATTERY_ERROR;
+}
+
 rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name) {
 	FILE *fp;
-	char data[32];
+	char data[256];
 	char path[128], init_path[100];
 	glob_t globbuf;
 	
@@ -68,33 +81,30 @@ rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name) {
 	fclose(fp);
 
 	/* Reading current charge */
-	sprintf(path, "%s/charge_now", init_path);
-	if(!file_get(path, data, sizeof(data)))
-		return NULL;
+	sprintf(path, "%s/uevent", init_path);
 	
-	battery->charge_now = atol(data);
+	if(!(fp = fopen(path, "r"))) {
+		perror(path);
+		battery->load = -1;
+		return battery;
+	}
 	
-	/* Reading full_charge */
-	sprintf(path, "%s/charge_full", init_path);
-	if(!file_get(path, data, sizeof(data)))
-		return NULL;
-	
-	battery->charge_full = atol(data);
-	
-	/* Reading status */
-	sprintf(path, "%s/status", init_path);
-	
-	if(!file_get(path, data, sizeof(data)))
-		return NULL;
-	
-	if(!strncmp(data, "Full", 4))
-		battery->status = FULL;
-	
-	else if(!strncmp(data, "Charging", 4))
-		battery->status = CHARGING;
-	
-	else if(!strncmp(data, "Discharging", 4))
-		battery->status = DISCHARGING;
+	while(fgets(data, sizeof(data), fp)) {
+		if(!strncmp(data, "POWER_SUPPLY_STATUS", 19)) {
+			battery->status = __rtinfo_internal_battery_getstatus(data + 20);
+			continue;
+		}
+		
+		if(!strncmp(data, "POWER_SUPPLY_CHARGE_FULL=", 25) || !strncmp(data, "POWER_SUPPLY_ENERGY_FULL=", 25)) {
+			battery->charge_full = atol(data + 25);
+			continue;
+		}
+		
+		if(!strncmp(data, "POWER_SUPPLY_CHARGE_NOW", 23) || !strncmp(data, "POWER_SUPPLY_ENERGY_NOW", 23)) {
+			battery->charge_now = atol(data + 24);
+			continue;
+		}
+	}
 	
 	/* Calculating usage */
 	battery->load = ((float) battery->charge_now / battery->charge_full) * 100;
