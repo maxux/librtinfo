@@ -73,8 +73,9 @@
 	
 	typedef struct rtinfo_network_t {
 		char *name;		/* Interface name */
-		struct rtinfo_network_node_t current;	/* Number of bytes transfered over the interface */
-		struct rtinfo_network_node_t previous;	/* Copy of previous bytes transfered over the interface */
+		struct rtinfo_network_node_t current;   /* Number of bytes transfered over the interface */
+		struct rtinfo_network_node_t previous;  /* Copy of previous bytes transfered over the interface */
+		struct rtinfo_network_node_t raw;       /* Raw previous (used for x86 limitation bypass) */
 		int64_t up_rate;		/* Upload rate (in b/s) */
 		int64_t down_rate;		/* Download rate (in b/s) */
 		char ip[16];			/* IP Address in char */
