@@ -78,11 +78,14 @@ rtinfo_network_t * rtinfo_init_network(int *nbiface) {
 		
 		net[i].name = getinterfacename(data);
 		
-		net[i].current.up   = 0;
-		net[i].current.down = 0;
+		net[i].current.up    = 0;
+		net[i].current.down  = 0;
 		
 		net[i].previous.up   = 0;
 		net[i].previous.down = 0;
+		
+		net[i].raw.up        = 0;
+		net[i].raw.down      = 0;
 		
 		i++;
 	}
@@ -95,6 +98,8 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 	FILE *fp;
 	char data[256];
 	short i = 0;
+	uint64_t tup, tdown;        // temporary read variable
+	uint64_t upinc, downinc;    // final increment values
 
 	fp = fopen(LIBRTINFO_NET_FILE, "r");
 
@@ -114,8 +119,28 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 		/* Saving previous data */
 		net[i].previous = net[i].current;
 		
-		net[i].current.up   = indexll(data, 10);
-		net[i].current.down = indexll(data, 2);
+		/* Reading current values */
+		tup   = indexll(data, 10);
+		tdown = indexll(data, 2);
+		
+		/* Comparing with previous data (x86 limitation bypass) */
+		if(tup < net[i].raw.up)
+			upinc = tup;
+			
+		else upinc = tup - net[i].raw.up;
+		
+		if(tdown < net[i].raw.down)
+			downinc = tdown;
+			
+		else downinc = tdown - net[i].raw.down;
+			
+		/* Writing final values */
+		net[i].current.up   += upinc;
+		net[i].current.down += downinc;
+		
+		/* Writing raw values */
+		net[i].raw.up   = tup;
+		net[i].raw.down = tdown;
 
 		i++;
 	}
