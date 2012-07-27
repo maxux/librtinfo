@@ -51,7 +51,8 @@
 		FULL,
 		CHARGING,
 		DISCHARGING,
-		BATTERY_ERROR
+		BATTERY_ERROR,
+		BATTERY_UNKNOWN
 		
 	} rtinfo_battery_status_t;
 	

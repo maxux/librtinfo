@@ -32,11 +32,14 @@ rtinfo_battery_status_t __rtinfo_internal_battery_getstatus(char *data) {
 	if(!strncmp(data, "Full", 4))
 		return FULL;
 	
-	else if(!strncmp(data, "Charging", 4))
+	else if(!strncmp(data, "Charging", 8))
 		return CHARGING;
 	
-	else if(!strncmp(data, "Discharging", 4))
+	else if(!strncmp(data, "Discharging", 11))
 		return DISCHARGING;
+
+	else if(!strncmp(data, "Unknown", 7))
+		return BATTERY_UNKNOWN;
 	
 	return BATTERY_ERROR;
 }
