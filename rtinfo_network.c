@@ -96,7 +96,7 @@ rtinfo_network_t * rtinfo_init_network(int *nbiface) {
 /* For each interfaces, save old values, write on node */
 rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 	FILE *fp;
-	char data[256];
+	char data[256], *pdata = data;
 	short i = 0;
 	uint64_t tup, tdown;        // temporary read variable
 	uint64_t upinc, downinc;    // final increment values
@@ -120,8 +120,12 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 		net[i].previous = net[i].current;
 		
 		/* Reading current values */
-		tup   = indexll(data, 10);
-		tdown = indexll(data, 2);
+		if(!(pdata = skip_until_colon(data)))
+			continue;
+		
+		/* Reading current values */
+		tup   = indexll(pdata, 8);
+		tdown = indexll(pdata, 0);
 		
 		/* Comparing with previous data (x86 limitation bypass) */
 		if(tup < net[i].raw.up)

@@ -4,7 +4,7 @@ include config.mk
 GCC = $(shell gcc -v 2>&1 | grep ^Target | cut -b 9- )
 
 ifneq "$(GCC)" ""
-    CC = $(GCC)-gcc
+	CC = $(GCC)-gcc
 endif
 
 SRC=$(wildcard *.c)

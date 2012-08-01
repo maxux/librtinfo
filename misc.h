@@ -6,4 +6,5 @@
 	long long indexll(char *line, int index);
 	char * file_get(char *filename, char *data, size_t size);
 	char * getinterfacename(char *line);
+	char * skip_until_colon(char *str);
 #endif

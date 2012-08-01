@@ -28,6 +28,18 @@ long long sum_line(char *line) {
 	return sum;
 }
 
+char * skip_until_colon(char *str) {
+	while(*str) {
+		if(*str == ':') {
+			while(*++str == ' ');
+			return str;
+			
+		} else str++;
+	}
+
+	return NULL;
+}
+
 long long indexll(char *line, int index) {
 	short i = 0, j = 0;
 	
