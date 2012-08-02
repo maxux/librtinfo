@@ -80,6 +80,7 @@
 		int64_t up_rate;		/* Upload rate (in b/s) */
 		int64_t down_rate;		/* Download rate (in b/s) */
 		char ip[16];			/* IP Address in char */
+		uint16_t speed;                 /* Link speed in (in Mbps) */
 		
 	} rtinfo_network_t;
 
@@ -89,6 +90,7 @@
 		int64_t up_rate;		/* Upload rate (in b/s) */
 		int64_t down_rate;		/* Download rate (in b/s) */
 		char ip[16];			/* IP Address in char */
+		uint16_t speed;                 /* Link speed in (in Mbps) */
 		
 	} rtinfo_network_legacy_t;
 	

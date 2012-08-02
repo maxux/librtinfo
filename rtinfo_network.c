@@ -27,8 +27,11 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <linux/netdevice.h>
+#include <linux/sockios.h>
+#include <linux/if.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <linux/ethtool.h>
 #include <unistd.h>
 #include "misc.h"
 #include "rtinfo.h"
@@ -160,12 +163,13 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 	int sockfd;
 	struct ifconf ifconf;
 	struct ifreq ifr[50];
+	struct ethtool_cmd edata;
 	int ifs;
 	int i, j;
 	char ip[INET_ADDRSTRLEN];
 	struct sockaddr_in *s_in;
 
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 	if(sockfd < 0)
 		diep("socket");
 
@@ -180,7 +184,11 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 	/* Reset IP */
 	for(j = 0; j < nbiface; j++)
 		*(net[j].ip) = '\0';
-				
+	
+	/* Link Speed */
+	edata.cmd = ETHTOOL_GSET;
+	
+	/* Reading each interfaces */
 	for(i = 0; i < ifs; i++) {
 		s_in = (struct sockaddr_in *) &ifr[i].ifr_addr;
 
@@ -190,6 +198,42 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 		for(j = 0; j < nbiface; j++) {
 			if(!strcmp(ifr[i].ifr_name, net[j].name)) {
 				strcpy(net[j].ip, ip);
+				
+				/* Grabbing Link Speed */
+				/* Slip loopback */
+				if(!strcmp(net[j].name, "lo"))
+					break;
+				
+				/* Reading... */
+				ifr[i].ifr_data = &edata;
+				if(ioctl(sockfd, SIOCETHTOOL, &ifr[i]) < 0)
+					perror(net[j].name);
+				
+				switch (edata.speed) {
+					case SPEED_10:
+						net[j].speed = 10;
+					break;
+					
+					case SPEED_100:
+						net[j].speed = 100;
+					break;
+					
+					case SPEED_1000:
+						net[j].speed = 1000;
+					break;
+					
+					case SPEED_2500:
+						net[j].speed = 2500;
+					break;
+					
+					case SPEED_10000:
+						net[j].speed = 10000;
+					break;
+					
+					default:
+						net[j].speed = 0;
+				}
+					
 				break;
 			}
 		}
