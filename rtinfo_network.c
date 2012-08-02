@@ -206,8 +206,10 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 				
 				/* Reading... */
 				ifr[i].ifr_data = &edata;
-				if(ioctl(sockfd, SIOCETHTOOL, &ifr[i]) < 0)
-					perror(net[j].name);
+				if(ioctl(sockfd, SIOCETHTOOL, &ifr[i]) < 0) {
+					net[j].speed = 0;
+					break;
+				}
 				
 				switch (edata.speed) {
 					case SPEED_10:

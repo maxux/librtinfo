@@ -57,7 +57,7 @@ int main(void) {
 	
 	printf("[I] ---\n");
 	for(i = 0; i < nbiface; i++)
-		printf("[ ] Network %d: %-8s | %-15s | %llu bytes/s | %llu bytes/s\n", i, net[i].name, net[i].ip, net[i].up_rate, net[i].down_rate);
+		printf("[ ] Network %d: %-8s | %-15s | %llu bytes/s | %llu bytes/s | Speed: %d Mbps\n", i, net[i].name, net[i].ip, net[i].up_rate, net[i].down_rate, net[i].speed);
 	
 	/* Reading Memory */
 	printf("[I] ---\n");

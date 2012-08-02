@@ -92,7 +92,7 @@
 		char ip[16];			/* IP Address in char */
 		uint16_t speed;                 /* Link speed in (in Mbps) */
 		
-	} rtinfo_network_legacy_t;
+	} __attribute__ ((packed)) rtinfo_network_legacy_t;
 	
 	/* Uptime Structure */
 	typedef struct rtinfo_uptime_t {
