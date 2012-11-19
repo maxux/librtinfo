@@ -1,5 +1,8 @@
 #ifndef __MISC_H
 	#define __MISC_H
+	
+	#define rtinfo_debug(...) if(LIBRTINFO_DEBUG) { printf(__VA_ARGS__); }
+	
 	void diep(char *str);
 	
 	long long sum_line(char *line);

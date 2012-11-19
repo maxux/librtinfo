@@ -6,7 +6,7 @@
 
 void diep(char *str) {
 	perror(str);
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 long long sum_line(char *line) {
@@ -91,7 +91,7 @@ char * getinterfacename(char *line) {
 		length++;
 	
 	/* Copy name */
-	name = (char*) malloc((sizeof(char) * length) + 1);
+	name = (char*) malloc(sizeof(char) * length + 1);
 	strncpy(name, line + j, length);
 	*(name + length) = '\0';
 	

@@ -22,21 +22,23 @@ int main(void) {
 	
 	rtinfo_network_t *net;
 	
-	int nbcpu, nbiface, i;
+	unsigned int i;
+	int nbcpu;
 	struct tm * timeinfo;
 	
 	/* Init Lib */
 	printf("[+] Initializing (librtinfo %.2f)...\n", rtinfo_version());
-	net = rtinfo_init_network(&nbiface);
-	cpu = rtinfo_init_cpu(&nbcpu);
+	net = rtinfo_init_network();
+	cpu = rtinfo_init_cpu();
 
 	/* Working */
-	/* You should while(...) { here */
 	
 	/* Pre-reading data */
 	printf("[+] Pre-reading data (cpu/network)\n");
-	rtinfo_get_cpu(cpu, nbcpu);
-	rtinfo_get_network(net, nbiface);
+	rtinfo_get_cpu(cpu);
+	rtinfo_get_network(net);
+	
+	/* You should while(...) { here */
 
 	/* Sleeping */
 	printf("[+] Waiting...\n");
@@ -44,20 +46,20 @@ int main(void) {
 	
 	/* Reading CPU */
 	printf("[+] New read...\n");
-	rtinfo_get_cpu(cpu, nbcpu);
-	rtinfo_mk_cpu_usage(cpu, nbcpu);
+	rtinfo_get_cpu(cpu);
+	rtinfo_mk_cpu_usage(cpu);
 	
 	printf("[+] Data Dump:\n\n");
-	for(i = 0; i < nbcpu; i++)
-		printf("[ ] CPU %d: %d%%\n", i, cpu[i].usage);
+	for(i = 0; i < cpu->nbcpu; i++)
+		printf("[ ] CPU %d: %d%%\n", i, cpu->dev[i].usage);
 	
 	/* Reading Network */
-	rtinfo_get_network(net, nbiface);
-	rtinfo_mk_network_usage(net, nbiface, UPDATE_INTERVAL / 1000);
+	rtinfo_get_network(net);
+	rtinfo_mk_network_usage(net, UPDATE_INTERVAL / 1000);
 	
 	printf("[I] ---\n");
-	for(i = 0; i < nbiface; i++)
-		printf("[ ] Network %d: %-8s | %-15s | %llu bytes/s | %llu bytes/s | Speed: %d Mbps\n", i, net[i].name, net[i].ip, net[i].up_rate, net[i].down_rate, net[i].speed);
+	for(i = 0; i < net->nbiface; i++)
+		printf("[ ] Network %d: %-8s | %-15s | %10llu bytes/s | %10llu bytes/s | Speed: %d Mbps\n", i, net->net[i].name, net->net[i].ip, net->net[i].up_rate, net->net[i].down_rate, net->net[i].speed);
 	
 	/* Reading Memory */
 	printf("[I] ---\n");

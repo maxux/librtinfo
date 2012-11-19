@@ -68,8 +68,7 @@ rtinfo_battery_t * rtinfo_get_battery(rtinfo_battery_t *battery, char *name) {
 	/* Init Path: BATTERY_PATH/name */
 	} else sprintf(init_path, "%s/%s", LIBRTINFO_BATTERY_PATH, name);
 	
-	if(LIBRTINFO_DEBUG)
-		printf("[+] Init Path: %s\n", init_path);
+	rtinfo_debug("[+] Init Path: %s\n", init_path);
 
 	/* Checking for battery presence */
 	sprintf(path, "%s/present", init_path);

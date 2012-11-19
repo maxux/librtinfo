@@ -36,21 +36,15 @@
 #include "misc.h"
 #include "rtinfo.h"
 
-rtinfo_network_t * rtinfo_init_network(int *nbiface) {
+unsigned int __rtinfo_internal_network_nbiface() {
 	FILE *fp;
 	char data[256];
-	rtinfo_network_t *net;
-	int i;
+	unsigned int nbiface = 0;
 	
-	fp = fopen(LIBRTINFO_NET_FILE, "r");
-
-	if(!fp) {
-		perror(LIBRTINFO_NET_FILE);
-		exit(1);
-	}
-
-	/* Counting number of interfaces availble */
-	*nbiface = 0;
+	if(!(fp = fopen(LIBRTINFO_NET_FILE, "r")))
+		diep(LIBRTINFO_NET_FILE);
+	
+	/* Reading file */
 	while(fgets(data, sizeof(data), fp) != NULL) {
 		/* Skip header */
 		if(!strncmp(data, "Inter-|", 7))
@@ -59,59 +53,132 @@ rtinfo_network_t * rtinfo_init_network(int *nbiface) {
 		if(!strncmp(data, " face |", 7))
 			continue;
 		
-		*nbiface += 1;
+		nbiface++;
 	}
 	
-	/* Allocating */
-	net = (rtinfo_network_t*) malloc(sizeof(rtinfo_network_t) * *nbiface);
-	if(!net)
+	fclose(fp);
+	
+	return nbiface;
+}
+
+rtinfo_network_if_t * __rtinfo_internal_network_getifbyname(rtinfo_network_t *net, char *ifname) {
+	unsigned int i;
+	
+	/* Reading each interfaces which got already a name */
+	for(i = 0; i < net->netcount; i++) {
+		if(net->net[i].name && !strcmp(net->net[i].name, ifname))
+			return net->net + i;
+	}
+	
+	/* No matching interface, searching the first empty */
+	rtinfo_debug("[-] librtinfo: interface <%s> not in memory, searching new slot\n", ifname);
+	for(i = 0; i < net->netcount; i++) {
+		if(!net->net[i].name)
+			return net->net + i;
+	}
+	
+	/* All slots are busy, searching the first one disabled */
+	for(i = 0; i < net->netcount; i++) {
+		if(!net->net[i].enabled)
+			return net->net + i;
+	}
+	
+	/* No empty slot, no match. Error */
+	return NULL;
+}
+
+rtinfo_network_t * __rtinfo_internal_network_reordering(rtinfo_network_t *net) {
+	rtinfo_network_if_t *copy, *current;
+	unsigned int i;
+	size_t u = sizeof(rtinfo_network_if_t) * net->netcount;
+	
+	/* Copy data */
+	if(!(copy = malloc(u)))
 		return NULL;
 	
-	rewind(fp);
+	memcpy(copy, net->net, u);
 	
-	/* Initializing values */
-	i = 0;
-	while(fgets(data, sizeof(data), fp) != NULL) {
-		/* Skip header */
-		if(!strncmp(data, "Inter-|", 7))
-			continue;
-		
-		if(!strncmp(data, " face |", 7))
-			continue;
-		
-		net[i].name = getinterfacename(data);
-		
-		net[i].current.up    = 0;
-		net[i].current.down  = 0;
-		
-		net[i].previous.up   = 0;
-		net[i].previous.down = 0;
-		
-		net[i].raw.up        = 0;
-		net[i].raw.down      = 0;
-		
-		i++;
+	/* Ordering [used][not used] */
+	current = net->net;
+	
+	for(i = 0; i < net->netcount; i++) {
+		if(copy[i].enabled)
+			*current++ = copy[i];
 	}
+	
+	for(i = 0; i < net->netcount; i++) {
+		if(!copy[i].enabled)
+			*current++ = copy[i];
+	}
+	
+	free(copy);
+	
+	return net;
+}
+
+rtinfo_network_t * rtinfo_init_network() {
+	rtinfo_network_t *net;
+	
+	rtinfo_debug("[+] librtinfo: initializing network\n");
+	
+	if(!(net = (rtinfo_network_t*) malloc(sizeof(rtinfo_network_t))))
+		return NULL;
+	
+	/* Counting number of interfaces availble */
+	net->nbiface = __rtinfo_internal_network_nbiface();
+	
+	/* Allocating */
+	if(!(net->net = (rtinfo_network_if_t*) calloc(net->nbiface, sizeof(rtinfo_network_if_t))))
+		return NULL;
+	
+	/* Saving current malloc */
+	net->netcount = net->nbiface;
+	
+	rtinfo_debug("[+] librtinfo: %u interfaces, %lu bytes\n", net->nbiface, net->nbiface * sizeof(rtinfo_network_if_t));
 	
 	return net;
 }
 
 /* For each interfaces, save old values, write on node */
-rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
+rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 	FILE *fp;
 	char data[256], *pdata = data;
-	short i = 0;
+	unsigned int i = 0;
 	uint64_t tup, tdown;        // temporary read variable
 	uint64_t upinc, downinc;    // final increment values
+	unsigned int newnbiface;
+	char *ifname;
+	rtinfo_network_if_t *intf;
+	char changed = 0;
 
-	fp = fopen(LIBRTINFO_NET_FILE, "r");
+	if(!(fp = fopen(LIBRTINFO_NET_FILE, "r")))
+		diep(LIBRTINFO_NET_FILE);
 
-	if(!fp) {
-		perror(LIBRTINFO_NET_FILE);
-		exit(1);
+	if((newnbiface = __rtinfo_internal_network_nbiface()) != net->nbiface) {
+		rtinfo_debug("[+] librtinfo: interface count changed: %u -> %u\n", net->nbiface, newnbiface);
+		
+		/* Reset enabled flag */
+		for(i = 0; i < net->netcount; i++)
+			net->net[i].enabled = 0;
+		
+		/* We got more interface, realloc */
+		if(newnbiface > net->netcount) {
+			if(!(net->net = (rtinfo_network_if_t*) realloc(net->net, sizeof(rtinfo_network_if_t) * newnbiface)))
+				return NULL;
+			
+			/* Writing zero to the new interface(s) */
+			bzero(net->net + net->nbiface, sizeof(rtinfo_network_if_t) * (newnbiface - net->nbiface));
+			net->netcount = newnbiface;
+		}
+		
+		net->nbiface = newnbiface;
+		
+		/* Interfaces changed */
+		changed = 1;
 	}
 
-	while(fgets(data, sizeof(data), fp) != NULL && i < nbiface) {
+	i = 0;
+	while(fgets(data, sizeof(data), fp) && i < net->netcount) {
 		/* Skip header */
 		if(!strncmp(data, "Inter-|", 7))
 			continue;
@@ -119,8 +186,23 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 		if(!strncmp(data, " face |", 7))
 			continue;
 		
+		/* Reading name */
+		ifname = getinterfacename(data);
+		
+		if(!(intf = __rtinfo_internal_network_getifbyname(net, ifname))) {
+			rtinfo_debug("[-] librtinfo: cannot find interface on array, this should not happen\n");
+			continue;
+		}
+		
+		/* Marking interface as enabled */
+		intf->enabled = 1;
+		
 		/* Saving previous data */
-		net[i].previous = net[i].current;
+		intf->previous = intf->current;
+		
+		/* Reading interface name (cannot be sur that the interface order has not changed) */
+		free(intf->name);
+		intf->name = ifname;
 		
 		/* Reading current values */
 		if(!(pdata = skip_until_colon(data)))
@@ -131,49 +213,56 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net, int nbiface) {
 		tdown = indexll(pdata, 0);
 		
 		/* Comparing with previous data (x86 limitation bypass) */
-		if(tup < net[i].raw.up)
+		if(tup < intf->raw.up)
 			upinc = tup;
 			
-		else upinc = tup - net[i].raw.up;
+		else upinc = tup - intf->raw.up;
 		
-		if(tdown < net[i].raw.down)
+		if(tdown < intf->raw.down)
 			downinc = tdown;
 			
-		else downinc = tdown - net[i].raw.down;
+		else downinc = tdown - intf->raw.down;
 			
 		/* Writing final values */
-		net[i].current.up   += upinc;
-		net[i].current.down += downinc;
+		intf->current.up   += upinc;
+		intf->current.down += downinc;
 		
 		/* Writing raw values */
-		net[i].raw.up   = tup;
-		net[i].raw.down = tdown;
-
+		intf->raw.up   = tup;
+		intf->raw.down = tdown;
+		
 		i++;
 	}
 
 	fclose(fp);
 	
-	rtinfo_get_network_ipv4(net, nbiface);
+	/* If interfaces changed, reordering data linear */
+	if(changed)
+		if(!__rtinfo_internal_network_reordering(net))
+			return NULL;
+	
+	/* Reading ethernet informations */
+	rtinfo_get_network_ipv4(net);
 	
 	return net;
 }
 
-rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
+rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net) {
 	int sockfd;
 	struct ifconf ifconf;
 	struct ifreq ifr[50];
 	struct ethtool_cmd edata;
-	int ifs;
-	int i, j;
+	int ifs, i;
+	unsigned int j;
 	char ip[INET_ADDRSTRLEN];
 	struct sockaddr_in *s_in;
+	
+	rtinfo_debug("[+] librtinfo: reading interfaces settings\n");
 
-	sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-	if(sockfd < 0)
+	if((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP)) < 0)
 		diep("socket");
 
-	ifconf.ifc_buf = (char *) ifr;
+	ifconf.ifc_buf = (char*) ifr;
 	ifconf.ifc_len = sizeof(ifr);
 
 	if(ioctl(sockfd, SIOCGIFCONF, &ifconf) == -1)
@@ -182,8 +271,8 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 	ifs = ifconf.ifc_len / sizeof(ifr[0]);
 	
 	/* Reset IP */
-	for(j = 0; j < nbiface; j++)
-		*(net[j].ip) = '\0';
+	for(j = 0; j < net->netcount; j++)
+		*(net->net[j].ip) = '\0';
 	
 	/* Link Speed */
 	edata.cmd = ETHTOOL_GSET;
@@ -195,47 +284,49 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 		if(!inet_ntop(AF_INET, &s_in->sin_addr, ip, sizeof(ip)))
 			diep("inet_ntop");
 
-		for(j = 0; j < nbiface; j++) {
-			if(!strcmp(ifr[i].ifr_name, net[j].name)) {
-				strcpy(net[j].ip, ip);
+		for(j = 0; j < net->nbiface; j++) {
+			if(!strcmp(ifr[i].ifr_name, net->net[j].name)) {
+				/* Writing IP address */
+				rtinfo_debug("[+] librtinfo: reading %d: %s/%s\n", i, ifr[i].ifr_name, ip);
+				strcpy(net->net[j].ip, ip);
 				
 				/* Grabbing Link Speed */
-				/* Slip loopback */
-				if(!strcmp(net[j].name, "lo"))
+				/* Skip loopback */
+				if(!strcmp(net->net[j].name, "lo"))
 					break;
 				
 				/* Reading... */
 				ifr[i].ifr_data = &edata;
 				if(ioctl(sockfd, SIOCETHTOOL, &ifr[i]) < 0) {
-					net[j].speed = 0;
+					net->net[j].speed = 0;
 					break;
 				}
 				
 				switch (edata.speed) {
 					case SPEED_10:
-						net[j].speed = 10;
+						net->net[j].speed = 10;
 					break;
 					
 					case SPEED_100:
-						net[j].speed = 100;
+						net->net[j].speed = 100;
 					break;
 					
 					case SPEED_1000:
-						net[j].speed = 1000;
+						net->net[j].speed = 1000;
 					break;
 					
 					case SPEED_2500:
-						net[j].speed = 2500;
+						net->net[j].speed = 2500;
 					break;
 					
 					case SPEED_10000:
-						net[j].speed = 10000;
+						net->net[j].speed = 10000;
 					break;
 					
 					default:
-						net[j].speed = 0;
+						net->net[j].speed = 0;
 				}
-					
+				
 				break;
 			}
 		}
@@ -246,19 +337,19 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net, int nbiface) {
 	return net;
 }
 
-rtinfo_network_t * rtinfo_mk_network_usage(rtinfo_network_t *net, int nbiface, int timewait) {
-	int i;
+rtinfo_network_t * rtinfo_mk_network_usage(rtinfo_network_t *net, int timewait) {
+	unsigned int i;
 	
 	/* Network Usage: (current load - previous load) / timewait (milli sec) */
-	for(i = 0; i < nbiface; i++) {
-		net[i].down_rate = ((net[i].current.down - net[i].previous.down) / (timewait / 1000));
-		net[i].up_rate   = ((net[i].current.up - net[i].previous.up) / (timewait / 1000));
+	for(i = 0; i < net->netcount; i++) {
+		net->net[i].down_rate = ((net->net[i].current.down - net->net[i].previous.down) / (timewait / 1000));
+		net->net[i].up_rate   = ((net->net[i].current.up - net->net[i].previous.up) / (timewait / 1000));
 		
-		if(net[i].down_rate < 0)
-			net[i].down_rate = 0;
+		if(net->net[i].down_rate < 0)
+			net->net[i].down_rate = 0;
 		
-		if(net[i].up_rate < 0)
-			net[i].up_rate = 0;
+		if(net->net[i].up_rate < 0)
+			net->net[i].up_rate = 0;
 	}
 
 	return net;

@@ -37,7 +37,7 @@ int __rtinfo_internal_hddtemp_connect() {
 	
 	/* Resolving name */
 	if((he = gethostbyname(LIBRTINFO_HDDTEMP_HOST)) == NULL)
-		perror("[-] hddtemp gethostbyname");
+		perror("[-] librtinfo: hddtemp gethostbyname");
 	
 	bcopy(he->h_addr, &server_addr.sin_addr, he->h_length);
 
@@ -46,14 +46,14 @@ int __rtinfo_internal_hddtemp_connect() {
 
 	/* Creating Socket */
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0)
-		perror("[-] hddtemp socket");
+	if(sockfd < 0)
+		perror("[-] librtinfo: hddtemp socket");
 
 	/* Init Connection */
 	connresult = connect(sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
 	
 	if(connresult < 0)
-		perror("[-] hddtemp connect");
+		perror("[-] librtinfo: hddtemp connect");
 	
 	return sockfd;
 }
@@ -64,8 +64,7 @@ uint16_t __rtinfo_internal_hddtemp_parse(char *buffer, unsigned int *peak) {
 	char *str = buffer;
 	
 	if(*buffer != '|') {
-		if(LIBRTINFO_DEBUG)
-			printf("[-] librtinfo hddtemp parser: wrong data\n");
+		rtinfo_debug("[-] librtinfo: hddtemp parser: wrong data\n");
 			
 		return 0;
 	}
@@ -87,7 +86,7 @@ uint16_t __rtinfo_internal_hddtemp_parse(char *buffer, unsigned int *peak) {
 				value += this;
 				disks++;
 				
-			} else if(LIBRTINFO_DEBUG) printf("[-] librtinfo hddtemp parser: error: %s\n", str);
+			} else rtinfo_debug("[-] librtinfo: hddtemp parser: error: %s\n", str);
 			
 			if(!(str = strstr(str, "||")))
 				break;
@@ -114,8 +113,7 @@ rtinfo_temp_hdd_t * rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *hddtemp) {
 	rlen = recv(sockfd, buffer, sizeof(buffer), MSG_WAITALL);
 	buffer[rlen] = '\0';
 	
-	if(LIBRTINFO_DEBUG)
-		printf("[+] librtinfo: hddtemp: %s\n", buffer);
+	rtinfo_debug("[+] librtinfo: hddtemp: %s\n", buffer);
 	
 	hddtemp->hdd_average = __rtinfo_internal_hddtemp_parse(buffer, &peak);
 	hddtemp->peak 	     = peak;
