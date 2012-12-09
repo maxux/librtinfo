@@ -23,7 +23,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdint.h>
-#include <stropts.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include "misc.h"

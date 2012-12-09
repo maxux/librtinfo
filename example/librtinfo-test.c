@@ -66,7 +66,7 @@ int main(void) {
 	if(!rtinfo_get_memory(&memory))
 		return 1;
 	
-	printf("[ ] RAM : Total: %llu ko - Used: %llu ko\n", memory.ram_used, memory.ram_total);
+	printf("[ ] RAM : Total: %llu ko - Used: %llu ko\n", memory.ram_total, memory.ram_used);
 	printf("[ ] SWAP: Total: %llu ko - Free: %llu ko\n", memory.swap_total, memory.swap_free);
 	
 	/* Reading Load Average */

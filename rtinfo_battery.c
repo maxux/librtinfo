@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <stropts.h>
 #include <unistd.h>
 #include <glob.h>
 #include "misc.h"
