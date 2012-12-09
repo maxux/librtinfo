@@ -1,0 +1,5 @@
+Warning: this is a staging version of librtinfo for Mac OS X
+
+ - Tested on OS X 10.5.8 PowerPC only, at this time.
+ - Support: cpu usage (summary), ram usage, swap usage, load avg, uptime
+            system time
