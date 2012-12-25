@@ -65,7 +65,7 @@
 	typedef struct rtinfo_battery_t {
 		uint32_t charge_full;	/* Battery full charge value (dependent unit) */
 		uint32_t charge_now;	/* Battery current charge value (dependent unit) */
-		char load;		/* Battery current load (in percent) */
+		int8_t load;		/* Battery current load (in percent) */
 		
 		enum info_battery_status_t status;	/* Battery current status */
 		
