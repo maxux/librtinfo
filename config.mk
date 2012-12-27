@@ -7,3 +7,5 @@ VERSION = $(MAJOR).00
 CFLAGS  = -fpic -W -Wall -O2 -pipe -ansi -pedantic -std=gnu99 -DVERSION=$(VERSION) -g
 LDFLAGS = -shared -Wl,-soname,$(LIB).so.$(MAJOR)
 LIBFILE = $(LIB).so.$(VERSION)
+
+CC = gcc
