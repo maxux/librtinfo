@@ -97,19 +97,3 @@ rtinfo_cpu_t * rtinfo_mk_cpu_usage(rtinfo_cpu_t *cpu) {
 		
 	return cpu;
 }
-
-/* 
-
-
-
-
-float CalculateCPULoad(unsigned long long idleTicks, unsigned long long totalTicks) {
-  unsigned long long totalTicksSinceLastTime = totalTicks-_previousTotalTicks;
-  unsigned long long idleTicksSinceLastTime  = idleTicks-_previousIdleTicks;
-  
-  float ret = 1.0f-((totalTicksSinceLastTime > 0) ? ((float)idleTicksSinceLastTime)/totalTicksSinceLastTime : 0);
-  
-  return ret;
-}
-
-*/

@@ -1,14 +1,14 @@
 include config.mk
 
-# Finding gcc target
-GCC = $(shell gcc -v 2>&1 | grep ^Target | cut -b 9- )
-
-ifneq "$(GCC)" ""
-    CC = $(GCC)-gcc
-endif
-
 SRC=$(wildcard *.c)
 OBJ=$(SRC:.c=.o)
+
+ifdef SystemRoot
+	RM   = del /Q
+	EXEC := $(EXEC).exe
+else
+	RM  = rm -fv
+endif
 
 all: options $(EXEC)
 
@@ -25,8 +25,7 @@ $(EXEC): $(OBJ)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm -fv *.o
+	$(RM) *.o
 
 mrproper: clean
-	rm -fv $(EXEC)
-
+	$(RM) $(EXEC)

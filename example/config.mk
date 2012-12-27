@@ -1,7 +1,7 @@
 EXEC = librtinfo-test
 
 # flags
-CFLAGS  = -W -Wall -O2 -pipe -ansi -pedantic -std=gnu99
+CFLAGS  = -W -Wall -O2 -pipe -ansi -pedantic -std=c99
 LDFLAGS = -lrtinfo
 
 CFLAGS  += "-I../"

@@ -1,11 +1,16 @@
+#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
 #include <signal.h>
-#include <ncurses.h>
 #include <rtinfo.h>
 #include <inttypes.h>
+
+#ifdef _WIN32
+	#include "windows.h"
+	#define usleep(x)		Sleep(x / 1000)
+#endif
 
 #define UPDATE_INTERVAL		1000000
 
@@ -23,7 +28,6 @@ int main(void) {
 	rtinfo_network_t *net;
 	
 	unsigned int i;
-	int nbcpu;
 	struct tm * timeinfo;
 	
 	/* Init Lib */
@@ -99,14 +103,14 @@ int main(void) {
 	if(!rtinfo_get_temp_cpu(&temp_cpu))
 		return 1;
 	
-	printf("[ ] CoreTemp Average: %d°C\n", temp_cpu.cpu_average);
-	printf("[ ] CPU Critical    : %d°C\n", temp_cpu.critical);
+	printf("[ ] CoreTemp Average: %d C\n", temp_cpu.cpu_average);
+	printf("[ ] CPU Critical    : %d C\n", temp_cpu.critical);
 	
 	printf("[I] ---\n");
 	if(!rtinfo_get_temp_hdd(&temp_hdd))
 		return 1;
 	
-	printf("[ ] HDD Temp Average: %u°C (highest: %u°C)\n", temp_hdd.hdd_average, temp_hdd.peak);
+	printf("[ ] HDD Temp Average: %u C (highest: %u C)\n", temp_hdd.hdd_average, temp_hdd.peak);
 	
 	/* You should close your while here */
 	
