@@ -24,7 +24,7 @@ install:
 	cp -Pf *.so* $(PREFIX)/lib/
 	ldconfig
 	mkdir -p $(PREFIX)/include
-	cp -f rtinfo.h $(PREFIX)/include/
+	cp -f ../common/rtinfo.h $(PREFIX)/include/
 
 uninstall:
 	rm -f $(PREFIX)/lib/$(LIB).*

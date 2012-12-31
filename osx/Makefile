@@ -22,7 +22,7 @@ install:
 	mkdir -p $(PREFIX)/lib
 	cp -Pf *.dylib* $(PREFIX)/lib/
 	mkdir -p $(PREFIX)/include
-	cp -f rtinfo.h $(PREFIX)/include/
+	cp -f ../common/rtinfo.h $(PREFIX)/include/
 
 uninstall:
 	rm -f $(PREFIX)/lib/$(LIB).*
