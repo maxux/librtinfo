@@ -35,7 +35,7 @@
 #include "misc.h"
 #include "rtinfo.h"
 
-unsigned int __rtinfo_internal_network_nbiface() {
+static unsigned int __rtinfo_internal_network_nbiface() {
 	FILE *fp;
 	char data[256];
 	unsigned int nbiface = 0;
@@ -60,7 +60,7 @@ unsigned int __rtinfo_internal_network_nbiface() {
 	return nbiface;
 }
 
-rtinfo_network_if_t * __rtinfo_internal_network_getifbyname(rtinfo_network_t *net, char *ifname) {
+static rtinfo_network_if_t * __rtinfo_internal_network_getifbyname(rtinfo_network_t *net, char *ifname) {
 	unsigned int i;
 	
 	/* Reading each interfaces which got already a name */
@@ -86,7 +86,7 @@ rtinfo_network_if_t * __rtinfo_internal_network_getifbyname(rtinfo_network_t *ne
 	return NULL;
 }
 
-rtinfo_network_t * __rtinfo_internal_network_reordering(rtinfo_network_t *net) {
+static rtinfo_network_t * __rtinfo_internal_network_reordering(rtinfo_network_t *net) {
 	rtinfo_network_if_t *copy, *current;
 	unsigned int i;
 	size_t u = sizeof(rtinfo_network_if_t) * net->netcount;
@@ -133,7 +133,7 @@ rtinfo_network_t * rtinfo_init_network() {
 	/* Saving current malloc */
 	net->netcount = net->nbiface;
 	
-	rtinfo_debug("[+] librtinfo: %u interfaces, %lu bytes\n", net->nbiface, net->nbiface * sizeof(rtinfo_network_if_t));
+	rtinfo_debug("[+] librtinfo: %u interfaces, %u bytes\n", net->nbiface, net->nbiface * sizeof(rtinfo_network_if_t));
 	
 	return net;
 }
@@ -274,6 +274,7 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net) {
 		*(net->net[j].ip) = '\0';
 	
 	/* Link Speed */
+	bzero(&edata, sizeof(edata));
 	edata.cmd = ETHTOOL_GSET;
 	
 	/* Reading each interfaces */
@@ -301,7 +302,7 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net) {
 					break;
 				}
 				
-				switch (edata.speed) {
+				switch(edata.speed) {
 					case SPEED_10:
 						net->net[j].speed = 10;
 					break;

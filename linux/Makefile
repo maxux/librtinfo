@@ -10,9 +10,8 @@ $(LIBFILE): $(OBJ)
 	/sbin/ldconfig -n .
 	ln -sf $(LIB).so.$(MAJOR) $(LIB).so
 
-
 %.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -fv *.o

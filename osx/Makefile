@@ -9,7 +9,6 @@ $(LIBFILE): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 	ln -sf $(LIB).dylib.$(VERSION) $(LIB).dylib
 
-
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
