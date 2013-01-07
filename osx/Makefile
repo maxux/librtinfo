@@ -10,7 +10,7 @@ $(LIBFILE): $(OBJ)
 	ln -sf $(LIB).dylib.$(VERSION) $(LIB).dylib
 
 %.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) -c $(CFLAGS) $<
 
 clean:
 	rm -fv *.o
