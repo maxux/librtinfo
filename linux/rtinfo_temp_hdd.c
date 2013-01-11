@@ -36,8 +36,10 @@ int __rtinfo_internal_hddtemp_connect() {
 	struct hostent *he;
 	
 	/* Resolving name */
-	if((he = gethostbyname(LIBRTINFO_HDDTEMP_HOST)) == NULL)
+	if((he = gethostbyname(LIBRTINFO_HDDTEMP_HOST)) == NULL) {
 		rtinfo_perror("[-] librtinfo: hddtemp gethostbyname");
+		return -1;
+	}
 	
 	bcopy(he->h_addr, &server_addr.sin_addr, he->h_length);
 
@@ -46,14 +48,19 @@ int __rtinfo_internal_hddtemp_connect() {
 
 	/* Creating Socket */
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(sockfd < 0)
+	if(sockfd < 0) {
 		rtinfo_perror("[-] librtinfo: hddtemp socket");
+		return -1;
+	}
 
 	/* Init Connection */
 	connresult = connect(sockfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
 	
-	if(connresult < 0)
+	if(connresult < 0) {
 		rtinfo_perror("[-] librtinfo: hddtemp connect");
+		close(sockfd);
+		return -1;
+	}
 	
 	return sockfd;
 }

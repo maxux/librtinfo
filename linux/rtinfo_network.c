@@ -35,6 +35,29 @@
 #include "misc.h"
 #include "rtinfo.h"
 
+static char * __rtinfo_internal_network_getinterfacename(char *line) {
+	int length = 0, i = 0, j;
+	char *name;
+	
+	/* Skipping spaces */
+	while(*(line + i) && isspace(*(line + i)))
+		i++;
+	
+	/* Saving start name position */
+	j = i;
+	
+	/* Reading name length */
+	while(*(line + i) && *(line + i++) != ':')
+		length++;
+	
+	/* Copy name */
+	name = (char *) malloc(sizeof(char) * length + 1);
+	strncpy(name, line + j, length);
+	*(name + length) = '\0';
+	
+	return name;
+}
+
 static unsigned int __rtinfo_internal_network_nbiface() {
 	FILE *fp;
 	char data[256];
@@ -138,6 +161,16 @@ rtinfo_network_t * rtinfo_init_network() {
 	return net;
 }
 
+void rtinfo_free_network(rtinfo_network_t *net) {
+	unsigned int i;
+	
+	for(i = 0; i < net->netcount; i++)
+		free(net->net[i].name);
+	
+	free(net->net);
+	free(net);
+}
+
 /* For each interfaces, save old values, write on node */
 rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 	FILE *fp;
@@ -156,9 +189,13 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 	if((newnbiface = __rtinfo_internal_network_nbiface()) != net->nbiface) {
 		rtinfo_debug("[+] librtinfo: interface count changed: %u -> %u\n", net->nbiface, newnbiface);
 		
-		/* Reset enabled flag */
-		for(i = 0; i < net->netcount; i++)
+		/* Reset enabled flag, cleaning memory */
+		for(i = 0; i < net->netcount; i++) {
 			net->net[i].enabled = 0;
+			
+			free(net->net[i].name);
+			net->net[i].name = NULL;
+		}
 		
 		/* We got more interface, realloc */
 		if(newnbiface > net->netcount) {
@@ -186,7 +223,7 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 			continue;
 		
 		/* Reading name */
-		ifname = getinterfacename(data);
+		ifname = __rtinfo_internal_network_getinterfacename(data);
 		
 		if(!(intf = __rtinfo_internal_network_getifbyname(net, ifname))) {
 			rtinfo_debug("[-] librtinfo: cannot find interface on array, this should not happen\n");

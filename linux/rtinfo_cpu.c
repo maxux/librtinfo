@@ -61,6 +61,11 @@ rtinfo_cpu_t * rtinfo_init_cpu() {
 	return cpu;
 }
 
+void rtinfo_free_cpu(rtinfo_cpu_t *cpu) {
+	free(cpu->dev);
+	free(cpu);
+}
+
 /* For each CPU, save old values, write on the info_cpu_node_t current value read from CPU_FILE */
 rtinfo_cpu_t * rtinfo_get_cpu(rtinfo_cpu_t *cpu) {
 	FILE *fp;

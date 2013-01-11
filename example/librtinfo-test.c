@@ -113,6 +113,8 @@ int main(void) {
 	printf("[ ] HDD Temp Average: %u C (highest: %u C)\n", temp_hdd.hdd_average, temp_hdd.peak);
 	
 	/* You should close your while here */
+	rtinfo_free_cpu(cpu);
+	rtinfo_free_network(net);
 	
 	return 0;
 }

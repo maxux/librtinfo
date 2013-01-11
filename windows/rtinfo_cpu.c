@@ -66,6 +66,11 @@ rtinfo_cpu_t * rtinfo_init_cpu() {
 	return cpu;
 }
 
+void rtinfo_free_cpu(rtinfo_cpu_t *cpu) {
+	free(cpu->dev);
+	free(cpu);
+}
+
 /* At this time, only summary are availible */
 rtinfo_cpu_t * rtinfo_get_cpu(rtinfo_cpu_t *cpu) {
 	unsigned int i;
