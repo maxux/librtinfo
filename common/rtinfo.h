@@ -123,33 +123,40 @@
 
 	/* Functions prototypes */
 	
-	/* Initialize CPU structure (required to use CPU) */
-	rtinfo_cpu_t * rtinfo_init_cpu();
+	/* Initialize/free cpu structure (required to use CPU) */
+	rtinfo_cpu_t *rtinfo_init_cpu();
+	void rtinfo_free_cpu(rtinfo_cpu_t *cpu);
 	
-	/* Update CPU structure */
-	rtinfo_cpu_t * rtinfo_get_cpu(rtinfo_cpu_t *cpu);
+	/* Update cpu structure */
+	rtinfo_cpu_t *rtinfo_get_cpu(rtinfo_cpu_t *cpu);
 	
-	/* Calculate the CPU Usage in percent for each CPU */
-	rtinfo_cpu_t * rtinfo_mk_cpu_usage(rtinfo_cpu_t *cpu);
+	/* Compute the cpu Usage in percent for each CPU */
+	rtinfo_cpu_t *rtinfo_mk_cpu_usage(rtinfo_cpu_t *cpu);
 	
 	/* Write structure with current values */
-	rtinfo_memory_t   * rtinfo_get_memory(rtinfo_memory_t *memory);
-	rtinfo_loadagv_t  * rtinfo_get_loadavg(rtinfo_loadagv_t *load);
-	rtinfo_battery_t  * rtinfo_get_battery(rtinfo_battery_t *battery, char *name);
-	rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp);
-	rtinfo_temp_hdd_t * rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *temp);
+	rtinfo_memory_t   *rtinfo_get_memory(rtinfo_memory_t *memory);
+	rtinfo_loadagv_t  *rtinfo_get_loadavg(rtinfo_loadagv_t *load);
+	rtinfo_battery_t  *rtinfo_get_battery(rtinfo_battery_t *battery, char *name);
+	rtinfo_temp_cpu_t *rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp);
+	rtinfo_temp_hdd_t *rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *temp);
 	
-	/* Initialize Network structure (required to use network) */
+	/* Initialize/free network structure (required to use network) */
 	rtinfo_network_t * rtinfo_init_network();
-	rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net);
-	rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net);
-	rtinfo_network_t * rtinfo_mk_network_usage(rtinfo_network_t *net, int timewait);
+	void rtinfo_free_network(rtinfo_network_t *net);
+	
+	/* Update network usage */
+	rtinfo_network_t *rtinfo_get_network(rtinfo_network_t *net);
+	rtinfo_network_t *rtinfo_get_network_ipv4(rtinfo_network_t *net);
+	
+	/* Compute the network rate */
+	rtinfo_network_t *rtinfo_mk_network_usage(rtinfo_network_t *net, int timewait);
 	
 	/* Return a (struct tm) pointer to the current local time */
-	struct tm * rtinfo_get_time();
+	struct tm *rtinfo_get_time();
 	
 	/* Update uptime structure */
-	rtinfo_uptime_t * rtinfo_get_uptime(rtinfo_uptime_t *uptime);
+	rtinfo_uptime_t *rtinfo_get_uptime(rtinfo_uptime_t *uptime);
 	
+	/* Return the current lib version */
 	float rtinfo_version();
 #endif

@@ -28,7 +28,7 @@ long long sum_line(char *line) {
 	return sum;
 }
 
-char * skip_until_colon(char *str) {
+char *skip_until_colon(char *str) {
 	while(*str) {
 		if(*str == ':') {
 			while(*++str == ' ');
@@ -56,7 +56,7 @@ long long indexll(char *line, int index) {
 	return (*(line + j)) ? atoll(line + j) : 0;
 }
 
-char * file_get(char *filename, char *data, size_t size) {
+char *file_get(char *filename, char *data, size_t size) {
 	FILE *fp;
 	
 	fp = fopen(filename, "r");
@@ -73,27 +73,4 @@ char * file_get(char *filename, char *data, size_t size) {
 	fclose(fp);
 	
 	return data;
-}
-
-char * getinterfacename(char *line) {
-	int length = 0, i = 0, j;
-	char *name;
-	
-	/* Skipping spaces */
-	while(*(line + i) && isspace(*(line + i)))
-		i++;
-	
-	/* Saving start name position */
-	j = i;
-	
-	/* Reading name length */
-	while(*(line + i) && *(line + i++) != ':')
-		length++;
-	
-	/* Copy name */
-	name = (char*) malloc(sizeof(char) * length + 1);
-	strncpy(name, line + j, length);
-	*(name + length) = '\0';
-	
-	return name;
 }

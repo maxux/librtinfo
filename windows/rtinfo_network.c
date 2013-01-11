@@ -64,6 +64,16 @@ rtinfo_network_t * rtinfo_init_network() {
 	return net;
 }
 
+void rtinfo_free_network(rtinfo_network_t *net) {
+	unsigned int i;
+	
+	for(i = 0; i < net->netcount; i++)
+		free(net->net[i].name);
+	
+	free(net->net);
+	free(net);
+}
+
 /* For each interfaces, save old values, write on node */
 rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 	return net;

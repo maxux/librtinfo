@@ -1,7 +1,7 @@
 /*
  * cpu temerature support for librtinfo
  * Copyright (C) 2012  DANIEL Maxime <root@maxux.net>
- *
+ * 
  * source from: http://www.ericcarlson.org/mrtg/temp.c
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,10 +36,10 @@
  *  kernel extensions are closed-source Apple proprietary, so I have no knowledge
  *  of their inner workings, only what I could gleam from information available
  *  in the IO Registry.
- *
+ *  
  *  Author: Eric Carlson, carl0240@tc.umn.edu
- *
- *  This software is supplied 'as is', with no warranty.
+ *  
+ *  This software is supplied 'as is', with no warranty. 
  *  You are free to use and/or redistribute this source, modified or unmodified,
  *  in any form.
  */
@@ -97,7 +97,7 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 	char *propertyNameTemp = "temperature";
 	CFNumberRef tempCFNum;
 	int tempNum;
-
+	
 	temp->critical    = 0;
 	temp->cpu_average = 0;
 
@@ -107,7 +107,7 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 	/* get the raw temperature number */
 	if(!CFNumberGetValue(tempCFNum, kCFNumberIntType, (void*) &tempNum))
 		return temp;
-
+	
 	/* The value stored in the IO registry appears to be the raw value returned from the temperature sensor,
 	 * a Dallas Semiconductor 1775 (ds1775) part. According to spec, the data is returned in two's complement form,
 	 * with apparently 12 of the 16 bit positions used (the default is 12 for the chip, and this seems to be what it is set to).
@@ -115,6 +115,6 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 	 */
 
 	temp->cpu_average = (uint16_t)((tempNum / 16.0) * 0.0625);
-
+	
 	return temp;
 }
