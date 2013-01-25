@@ -27,6 +27,18 @@
 #include "misc.h"
 #include "rtinfo.h"
 
+typedef struct cpu_temp_t {
+	char *path;
+	double multiplier;
+	
+} cpu_temp_t;
+
+/* should be ordered by pertinence */
+cpu_temp_t __temp_cpu[] = {
+	{.path = "/sys/devices/platform/coretemp.0/temp*_input", .multiplier = 0.001},
+	{.path = "/sys/class/thermal/thermal_zone0/temp",        .multiplier = 0.001},
+};
+
 /*
  *  Coretemp support
  */
@@ -34,35 +46,47 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 	FILE *fp;
 	glob_t globbuf;
 	char data[32];
-	size_t i;
-	uint64_t value = 0;
-
+	size_t k, i;
+	double value = 0;
+	unsigned int found = 0;
+	
+	/* default value */
+	temp->cpu_average = 0;
+	temp->critical    = 0;
+	
 	globbuf.gl_offs = 1;
-	glob("/sys/devices/platform/coretemp.0/temp*_input", GLOB_NOSORT, NULL, &globbuf);
 	
-	if(globbuf.gl_pathc == 0) {
-		temp->cpu_average = 0;
-		temp->critical    = 0;
-		return temp;
-	}
-	
-	for(i = 0; i < globbuf.gl_pathc; i++) {
-		fp = fopen(globbuf.gl_pathv[i], "r");
-		if(!fp) {
-			perror(globbuf.gl_pathv[i]);
-			return NULL;
+	for(k = 0; k < sizeof(__temp_cpu) / sizeof(cpu_temp_t); k++) {
+		glob(__temp_cpu[k].path, GLOB_NOSORT, NULL, &globbuf);
+		
+		for(i = 0; i < globbuf.gl_pathc; i++) {
+			fp = fopen(globbuf.gl_pathv[i], "r");
+			if(!fp) {
+				perror(globbuf.gl_pathv[i]);
+				return NULL;
+			}
+			
+			if(fgets(data, sizeof(data), fp))
+				value += atoi(data) * __temp_cpu[k].multiplier;
+
+			found++;
+			
+			fclose(fp);
 		}
 		
-		if(fgets(data, sizeof(data), fp))
-			value += atoi(data);
+		globfree(&globbuf);
 		
-		fclose(fp);
+		/* found a sensors, break here */
+		if(globbuf.gl_pathc)
+			break;
 	}
 	
-	globfree(&globbuf);
+	/* no temperature found */
+	if(!value)
+		return temp;
 	
 	/* Reading Critital value */
-	glob("/sys/devices/platform/coretemp.0/temp*_crit", GLOB_NOSORT, NULL, &globbuf);
+	/* glob("/sys/devices/platform/coretemp.0/temp*_crit", GLOB_NOSORT, NULL, &globbuf);
 	if(globbuf.gl_pathc != 0) {	
 		fp = fopen(globbuf.gl_pathv[0], "r");
 		if(fp) {
@@ -78,10 +102,10 @@ rtinfo_temp_cpu_t * rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp) {
 		
 	} else temp->critical = 0;
 	
-	globfree(&globbuf);
+	globfree(&globbuf); */
 	
-	/* Divide per 1000, and divide by core numbers, to get an average */
-	temp->cpu_average = value / (globbuf.gl_pathc * 1000);
+	/* Compute average */
+	temp->cpu_average = value / found;
 
 	return temp;
 }
