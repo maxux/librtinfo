@@ -249,6 +249,8 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 		tdown = indexll(pdata, 0);
 		
 		/* Comparing with previous data (x86 limitation bypass) */
+		// FIXME
+		/*
 		if(tup < intf->raw.up)
 			upinc = tup;
 			
@@ -258,6 +260,10 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 			downinc = tdown;
 			
 		else downinc = tdown - intf->raw.down;
+		*/
+		
+		upinc   = tup - intf->raw.up;		
+		downinc = tdown - intf->raw.down;
 			
 		/* Writing final values */
 		intf->current.up   += upinc;
