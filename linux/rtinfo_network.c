@@ -156,7 +156,7 @@ rtinfo_network_t * rtinfo_init_network() {
 	/* Saving current malloc */
 	net->netcount = net->nbiface;
 	
-	rtinfo_debug("[+] librtinfo: %u interfaces, %u bytes\n", net->nbiface, net->nbiface * sizeof(rtinfo_network_if_t));
+	rtinfo_debug("[+] librtinfo: %u interfaces, %lu bytes\n", net->nbiface, net->nbiface * sizeof(rtinfo_network_if_t));
 	
 	return net;
 }
@@ -385,8 +385,8 @@ rtinfo_network_t * rtinfo_mk_network_usage(rtinfo_network_t *net, int timewait) 
 	
 	/* Network Usage: (current load - previous load) / timewait (milli sec) */
 	for(i = 0; i < net->netcount; i++) {
-		net->net[i].down_rate = ((net->net[i].current.down - net->net[i].previous.down) / (timewait / 1000));
-		net->net[i].up_rate   = ((net->net[i].current.up - net->net[i].previous.up) / (timewait / 1000));
+		net->net[i].down_rate = ((net->net[i].current.down - net->net[i].previous.down) / (timewait / 1000.0));
+		net->net[i].up_rate   = ((net->net[i].current.up - net->net[i].previous.up) / (timewait / 1000.0));
 		
 		if(net->net[i].down_rate < 0)
 			net->net[i].down_rate = 0;
