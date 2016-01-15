@@ -35,7 +35,7 @@ rtinfo_cpu_t * rtinfo_init_cpu() {
 	unsigned int nbcpu;
 	
 	if(!(fp = fopen(LIBRTINFO_CPU_FILE, "r")))
-		diep(LIBRTINFO_CPU_FILE);
+		__rtinfo_internal_diep(LIBRTINFO_CPU_FILE);
 
 	/* Counting number of cpu availble */
 	nbcpu = 0;
@@ -73,7 +73,7 @@ rtinfo_cpu_t * rtinfo_get_cpu(rtinfo_cpu_t *cpu) {
 	unsigned short i = 0, j = 0;
 
 	if(!(fp = fopen(LIBRTINFO_CPU_FILE, "r")))
-		diep(LIBRTINFO_CPU_FILE);
+		__rtinfo_internal_diep(LIBRTINFO_CPU_FILE);
 
 	while(fgets(data, sizeof(data), fp) != NULL && j < cpu->nbcpu) {
 		/* Checking cpu line */

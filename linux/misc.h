@@ -4,7 +4,7 @@
 	#define rtinfo_debug(...) if(LIBRTINFO_DEBUG) { printf(__VA_ARGS__); }
 	#define rtinfo_perror(str) if(LIBRTINFO_DEBUG) { perror(str); }
 	
-	void diep(char *str);
+	void __rtinfo_internal_diep(char *str);
 	
 	long long sum_line(char *line);
 	long long indexll(char *line, int index);

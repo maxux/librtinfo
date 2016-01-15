@@ -9,6 +9,7 @@ $(LIBFILE): $(OBJ)
 	$(CC) -o $@ $^ $(LDFLAGS)
 	/sbin/ldconfig -n .
 	ln -sf $(LIB).so.$(MAJOR) $(LIB).so
+	ar rcs $(LIB).a $(OBJ)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
@@ -22,6 +23,7 @@ mrproper: clean
 install:
 	mkdir -p $(PREFIX)/lib
 	cp -Pf *.so* $(PREFIX)/lib/
+	cp -Pf *.a $(PREFIX)/lib/
 	ldconfig
 	mkdir -p $(PREFIX)/include
 	cp -f ../common/rtinfo.h $(PREFIX)/include/

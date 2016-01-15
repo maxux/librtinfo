@@ -64,7 +64,7 @@ static unsigned int __rtinfo_internal_network_nbiface() {
 	unsigned int nbiface = 0;
 	
 	if(!(fp = fopen(LIBRTINFO_NET_FILE, "r")))
-		diep(LIBRTINFO_NET_FILE);
+		__rtinfo_internal_diep(LIBRTINFO_NET_FILE);
 	
 	/* Reading file */
 	while(fgets(data, sizeof(data), fp) != NULL) {
@@ -184,7 +184,7 @@ rtinfo_network_t * rtinfo_get_network(rtinfo_network_t *net) {
 	char changed = 0;
 
 	if(!(fp = fopen(LIBRTINFO_NET_FILE, "r")))
-		diep(LIBRTINFO_NET_FILE);
+		__rtinfo_internal_diep(LIBRTINFO_NET_FILE);
 
 	if((newnbiface = __rtinfo_internal_network_nbiface()) != net->nbiface) {
 		rtinfo_debug("[+] librtinfo: interface count changed: %u -> %u\n", net->nbiface, newnbiface);
@@ -302,13 +302,13 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net) {
 	rtinfo_debug("[+] librtinfo: reading interfaces settings\n");
 
 	if((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP)) < 0)
-		diep("socket");
+		__rtinfo_internal_diep("socket");
 
 	ifconf.ifc_buf = (char*) ifr;
 	ifconf.ifc_len = sizeof(ifr);
 
 	if(ioctl(sockfd, SIOCGIFCONF, &ifconf) == -1)
-		diep("ioctl");
+		__rtinfo_internal_diep("ioctl");
 
 	ifs = ifconf.ifc_len / sizeof(ifr[0]);
 	
@@ -325,7 +325,7 @@ rtinfo_network_t * rtinfo_get_network_ipv4(rtinfo_network_t *net) {
 		s_in = (struct sockaddr_in *) &ifr[i].ifr_addr;
 
 		if(!inet_ntop(AF_INET, &s_in->sin_addr, ip, sizeof(ip)))
-			diep("inet_ntop");
+			__rtinfo_internal_diep("inet_ntop");
 
 		for(j = 0; j < net->nbiface; j++) {
 			if(!strcmp(ifr[i].ifr_name, net->net[j].name)) {

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "misc.h"
 
-void diep(char *str) {
+void __rtinfo_internal_diep(char *str) {
 	perror(str);
 	exit(EXIT_FAILURE);
 }

@@ -33,7 +33,7 @@ rtinfo_memory_t * rtinfo_get_memory(rtinfo_memory_t *memory) {
 	unsigned int _memfree = 0, _buffers = 0, _cached = 0;
 
 	if(!(fp = fopen(LIBRTINFO_MEMORY_FILE, "r")))
-		diep(LIBRTINFO_MEMORY_FILE);
+		__rtinfo_internal_diep(LIBRTINFO_MEMORY_FILE);
 
 	/* Init Memory */
 	memory->ram_used  = 0;	/* Init Used ram to zero */
