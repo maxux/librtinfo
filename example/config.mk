@@ -1,7 +1,7 @@
 EXEC = librtinfo-test
 
 # flags
-CFLAGS  = -W -Wall -O2 -pipe -ansi -pedantic -std=c99 -L.
+CFLAGS  = -W -Wall -O2 -pipe -ansi -pedantic -std=c99 -I../linux
 LDFLAGS = -lrtinfo -L../linux
 
 CC = gcc

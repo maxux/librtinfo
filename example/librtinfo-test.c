@@ -70,7 +70,7 @@ int main(void) {
 	
 	for(i = 0; i < dsk->nbdisk; i++) {
 		printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
-		printf("[ ] Disk %s: %llu MiB/s read, %llu MiB/s written\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024, dsk->dev[i].write_speed / 1024 / 1024);
+		printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written, IOPS: %d\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0, dsk->dev[i].iops);
 	}
 	
 	/* Reading Network */
@@ -141,7 +141,7 @@ int main(void) {
 		
 		for(i = 0; i < dsk->nbdisk; i++) {
 			// printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
-			printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0);
+			printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written, IOPS: %d\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0, dsk->dev[i].iops);
 		}
 	}
 	

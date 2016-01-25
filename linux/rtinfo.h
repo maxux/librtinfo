@@ -41,6 +41,8 @@
 	typedef struct rtinfo_disk_sectors_t {
 		uint64_t read;
 		uint64_t written;
+		uint64_t read_completed;
+		uint64_t write_completed;
 		
 	} rtinfo_disk_sectors_t;
 	
@@ -51,6 +53,7 @@
 		unsigned short sectorsize;                /* This disk sector size */
 		uint64_t read_speed;                      /* Read speed in bytes/s */
 		uint64_t write_speed;                     /* Write speed in bytes/s */
+		uint64_t iops;                            /* IOPS */
 		
 	} rtinfo_disk_dev_t;
 	

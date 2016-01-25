@@ -213,6 +213,9 @@ rtinfo_disk_t *rtinfo_get_disk(rtinfo_disk_t *disk) {
 		match = index_string(data, 0);		
 		disk->dev[i].current.read = indexll(match, 5) * disk->dev[i].sectorsize;
 		disk->dev[i].current.written  = indexll(match, 9) * disk->dev[i].sectorsize;
+		
+		disk->dev[i].current.read_completed  = indexll(match, 3);
+		disk->dev[i].current.write_completed  = indexll(match, 7);
 
 		i++;
 	}
@@ -224,10 +227,16 @@ rtinfo_disk_t *rtinfo_get_disk(rtinfo_disk_t *disk) {
 
 rtinfo_disk_t *rtinfo_mk_disk_usage(rtinfo_disk_t *disk, int timewait) {
 	unsigned int i;
+	uint64_t previous, current;
 	
 	for(i = 0; i < disk->nbdisk; i++) {
 		disk->dev[i].read_speed  = (disk->dev[i].current.read - disk->dev[i].previous.read) / (timewait / 1000.0);
 		disk->dev[i].write_speed = (disk->dev[i].current.written - disk->dev[i].previous.written) / (timewait / 1000.0);
+		
+		previous = disk->dev[i].previous.read_completed + disk->dev[i].previous.write_completed;
+		current  = disk->dev[i].current.read_completed + disk->dev[i].current.write_completed;
+		
+		disk->dev[i].iops = (current - previous) / (timewait / 1000.0);
 	}
 		
 	return disk;
