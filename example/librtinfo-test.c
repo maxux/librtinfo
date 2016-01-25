@@ -18,6 +18,7 @@ int main(void) {
 	rtinfo_memory_t memory;
 	rtinfo_loadagv_t loadavg;
 	rtinfo_cpu_t *cpu;
+	rtinfo_disk_t *dsk;
 	
 	rtinfo_uptime_t uptime;
 	rtinfo_temp_cpu_t temp_cpu;
@@ -34,13 +35,19 @@ int main(void) {
 	printf("[+] Initializing (librtinfo %.2f)...\n", rtinfo_version());
 	net = rtinfo_init_network();
 	cpu = rtinfo_init_cpu();
+	dsk = rtinfo_init_disk("sd");
 
 	/* Working */
+	printf("[+] CPU: %u, Disk: %u\n", cpu->nbcpu, dsk->nbdisk);
+	
+	for(i = 0; i < dsk->nbdisk; i++)
+		printf("[+] Disk found: %s, sector size: %d\n", dsk->dev[i].name, dsk->dev[i].sectorsize);
 	
 	/* Pre-reading data */
 	printf("[+] Pre-reading data (cpu/network)\n");
 	rtinfo_get_cpu(cpu);
 	rtinfo_get_network(net);
+	rtinfo_get_disk(dsk);
 	
 	/* You should while(...) { here */
 
@@ -57,13 +64,22 @@ int main(void) {
 	for(i = 0; i < cpu->nbcpu; i++)
 		printf("[ ] CPU %d: %d%%\n", i, cpu->dev[i].usage);
 	
+	
+	rtinfo_get_disk(dsk);
+	rtinfo_mk_disk_usage(dsk, UPDATE_INTERVAL / 1000);
+	
+	for(i = 0; i < dsk->nbdisk; i++) {
+		printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
+		printf("[ ] Disk %s: %llu MiB/s read, %llu MiB/s written\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024, dsk->dev[i].write_speed / 1024 / 1024);
+	}
+	
 	/* Reading Network */
 	rtinfo_get_network(net);
 	rtinfo_mk_network_usage(net, UPDATE_INTERVAL / 1000);
 	
 	printf("[I] ---\n");
 	for(i = 0; i < net->nbiface; i++)
-		printf("[ ] Network %d: %-8s | %-15s | %10llu bytes/s | %10llu bytes/s | Speed: %d Mbps\n", i, net->net[i].name, net->net[i].ip, net->net[i].up_rate, net->net[i].down_rate, net->net[i].speed);
+		printf("[ ] Network %d: %-15s | %-15s | %10llu bytes/s | %10llu bytes/s | Speed: %d Mbps\n", i, net->net[i].name, net->net[i].ip, net->net[i].up_rate, net->net[i].down_rate, net->net[i].speed);
 	
 	/* Reading Memory */
 	printf("[I] ---\n");
@@ -115,6 +131,19 @@ int main(void) {
 	/* You should close your while here */
 	rtinfo_free_cpu(cpu);
 	rtinfo_free_network(net);
+	// rtinfo_free_disk(dsk);
+
+	while(1) {
+		rtinfo_get_disk(dsk);
+		usleep(UPDATE_INTERVAL);
+		rtinfo_get_disk(dsk);
+		rtinfo_mk_disk_usage(dsk, UPDATE_INTERVAL / 1000);
+		
+		for(i = 0; i < dsk->nbdisk; i++) {
+			// printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
+			printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0);
+		}
+	}
 	
 	return 0;
 }

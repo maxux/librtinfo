@@ -1,24 +1,25 @@
 #ifndef __SYSINFO_H
 	#define __SYSINFO_H
 	
-	#define LIBRTINFO_DEBUG			0		/* Enable lib debug message */
-	#define LIBRTINFO_HDDTEMP_HOST		"127.0.0.1" 	/* Should always be localhost */
-	#define LIBRTINFO_HDDTEMP_PORT		7634
+	#define LIBRTINFO_DEBUG          0              /* Enable lib debug message */
+	#define LIBRTINFO_HDDTEMP_HOST   "127.0.0.1"    /* Should always be localhost */
+	#define LIBRTINFO_HDDTEMP_PORT   7634
 	
 	/* System defines */
-	#define LIBRTINFO_MEMORY_FILE	"/proc/meminfo"
-	#define LIBRTINFO_LOADAVG_FILE	"/proc/loadavg"
-	#define LIBRTINFO_CPU_FILE	"/proc/stat"
-	#define LIBRTINFO_NET_FILE	"/proc/net/dev"
-	#define LIBRTINFO_UPTIME_FILE	"/proc/uptime"
-	#define LIBRTINFO_BATTERY_PATH	"/sys/class/power_supply/"
+	#define LIBRTINFO_MEMORY_FILE   "/proc/meminfo"
+	#define LIBRTINFO_LOADAVG_FILE  "/proc/loadavg"
+	#define LIBRTINFO_CPU_FILE      "/proc/stat"
+	#define LIBRTINFO_NET_FILE      "/proc/net/dev"
+	#define LIBRTINFO_UPTIME_FILE   "/proc/uptime"
+	#define LIBRTINFO_BATTERY_PATH  "/sys/class/power_supply/"
+	#define LIBRTINFO_DISK_FILE     "/proc/diskstats"
 	
 	#include <stdint.h>
 	
 	/* CPU Structures */
 	typedef struct rtinfo_cpu_time_t {
-		uint64_t time_total;			/* Total CPU Time */
-		uint64_t time_idle;			/* Idle CPU Time */
+		uint64_t time_total;        /* Total CPU Time */
+		uint64_t time_idle;         /* Idle CPU Time */
 		
 	} rtinfo_cpu_node_t;
 	
@@ -36,6 +37,29 @@
 		struct rtinfo_cpu_dev_t *dev;    /* CPU array data */
 		
 	} rtinfo_cpu_t;
+	
+	typedef struct rtinfo_disk_sectors_t {
+		uint64_t read;
+		uint64_t written;
+		
+	} rtinfo_disk_sectors_t;
+	
+	typedef struct rtinfo_disk_dev_t {
+		char *name;                               /* Device name */
+		struct rtinfo_disk_sectors_t current;     /* Instant sectors values  */
+		struct rtinfo_disk_sectors_t previous;    /* Previous sectors values */
+		unsigned short sectorsize;                /* This disk sector size */
+		uint64_t read_speed;                      /* Read speed in bytes/s */
+		uint64_t write_speed;                     /* Write speed in bytes/s */
+		
+	} rtinfo_disk_dev_t;
+	
+	typedef struct rtinfo_disk_t {
+		unsigned int nbdisk;              /* Disk count */
+		struct rtinfo_disk_dev_t *dev;    /* Disk array data */
+		char *prefix;                     /* Prefix disk name filter */
+		
+	} rtinfo_disk_t;
 	
 	/* Memory (RAM/SWAP) Structure */
 	typedef struct rtinfo_memory_t {
@@ -127,11 +151,21 @@
 	rtinfo_cpu_t *rtinfo_init_cpu();
 	void rtinfo_free_cpu(rtinfo_cpu_t *cpu);
 	
+	/* Initialize/free disk structure (required to use Disk) */
+	rtinfo_disk_t *rtinfo_init_disk(char *prefix);
+	void rtinfo_free_disk(rtinfo_disk_t *disk);
+	
 	/* Update cpu structure */
 	rtinfo_cpu_t *rtinfo_get_cpu(rtinfo_cpu_t *cpu);
 	
+	/* Update disk structure */
+	rtinfo_disk_t *rtinfo_get_disk(rtinfo_disk_t *disk);
+	
 	/* Compute the cpu Usage in percent for each CPU */
 	rtinfo_cpu_t *rtinfo_mk_cpu_usage(rtinfo_cpu_t *cpu);
+	
+	/* Compute the disk speed for each disk */
+	rtinfo_disk_t *rtinfo_mk_disk_usage(rtinfo_disk_t *disk, int timewait);
 	
 	/* Write structure with current values */
 	rtinfo_memory_t   *rtinfo_get_memory(rtinfo_memory_t *memory);

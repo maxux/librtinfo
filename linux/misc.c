@@ -40,6 +40,37 @@ char *skip_until_colon(char *str) {
 	return NULL;
 }
 
+char *index_string(char *str, int index) {
+	short i = 0, j = 0;
+	char *line = str;
+	
+	while(*line && isspace(*line))
+		line++;
+	
+	for(i = 0; i < index; i++) {
+		/* Skipping non-spaces */
+		while(*(line + j) && !isspace(*(line + j)))
+			j++;
+		
+		/* Skipping contingnous spaces */
+		while(*(line + j) && isspace(*(line + j)))
+			j++;
+	}
+	
+	return line + j;
+}
+
+size_t field_length(char *str, int index) {
+	char *init;
+	int i = 0;
+	
+	init = index_string(str, index);
+	while(init[i] && !isspace(init[i]))
+		i++;
+	
+	return i;
+}
+
 long long indexll(char *line, int index) {
 	short i = 0, j = 0;
 	

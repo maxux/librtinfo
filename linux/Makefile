@@ -19,6 +19,7 @@ clean:
 
 mrproper: clean
 	rm -fv $(LIBFILE) $(LIB).so*
+	rm -fv $(LIBFILE) $(LIB).a
 
 install:
 	mkdir -p $(PREFIX)/lib
@@ -26,7 +27,7 @@ install:
 	cp -Pf *.a $(PREFIX)/lib/
 	ldconfig
 	mkdir -p $(PREFIX)/include
-	cp -f ../common/rtinfo.h $(PREFIX)/include/
+	cp -f rtinfo.h $(PREFIX)/include/
 
 uninstall:
 	rm -f $(PREFIX)/lib/$(LIB).*

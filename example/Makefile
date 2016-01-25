@@ -3,27 +3,9 @@ include config.mk
 SRC=$(wildcard *.c)
 OBJ=$(SRC:.c=.o)
 
-ifdef SystemRoot
-	RM   = del /Q
-	EXEC := $(EXEC).exe
-else
-	RM  = rm -fv
-endif
+RM  = rm -fv
 
-all:
-	@echo "Please specify: linux windows osx"
-
-linux: trg_linux
-trg_linux: LDFLAGS += -L../linux
-trg_linux: options $(EXEC)
-
-windows: options trg_windows $(EXEC)
-trg_windows: LDFLAGS += -L../windows
-trg_windows: options $(EXEC)
-
-osx: options trg_osx $(EXEC)
-trg_osx: LDFLAGS += -L../osx
-trg_osx: options $(EXEC)
+all: options $(EXEC)
 
 options: config.mk
 	@echo $(EXEC) build options:

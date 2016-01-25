@@ -10,4 +10,6 @@
 	long long indexll(char *line, int index);
 	char *file_get(char *filename, char *data, size_t size);
 	char *skip_until_colon(char *str);
+	char *index_string(char *str, int index);
+	size_t field_length(char *str, int index);
 #endif
