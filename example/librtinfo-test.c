@@ -131,19 +131,7 @@ int main(void) {
 	/* You should close your while here */
 	rtinfo_free_cpu(cpu);
 	rtinfo_free_network(net);
-	// rtinfo_free_disk(dsk);
-
-	while(1) {
-		rtinfo_get_disk(dsk);
-		usleep(UPDATE_INTERVAL);
-		rtinfo_get_disk(dsk);
-		rtinfo_mk_disk_usage(dsk, UPDATE_INTERVAL / 1000);
-		
-		for(i = 0; i < dsk->nbdisk; i++) {
-			// printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
-			printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written, IOPS: %d\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0, dsk->dev[i].iops);
-		}
-	}
+	rtinfo_free_disk(dsk);
 	
 	return 0;
 }
