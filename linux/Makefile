@@ -17,6 +17,9 @@ $(LIBFILE): $(OBJ)
 clean:
 	rm -fv *.o
 
+debug: CFLAGS += -DLIBRTINFO_DEBUG=1 -g
+debug: $(LIBFILE)
+
 mrproper: clean
 	rm -fv $(LIBFILE) $(LIB).so*
 	rm -fv $(LIBFILE) $(LIB).a

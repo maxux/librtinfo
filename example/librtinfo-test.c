@@ -36,6 +36,9 @@ int main(void) {
 	net = rtinfo_init_network();
 	cpu = rtinfo_init_cpu();
 	dsk = rtinfo_init_disk("sd");
+	
+	/* Initialize hdd temp connection */
+	rtinfo_init_temp_hdd(&temp_hdd);
 
 	/* Working */
 	printf("[+] CPU: %u, Disk: %u\n", cpu->nbcpu, dsk->nbdisk);

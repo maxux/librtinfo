@@ -1,7 +1,10 @@
 #ifndef __SYSINFO_H
 	#define __SYSINFO_H
 	
-	#define LIBRTINFO_DEBUG          0              /* Enable lib debug message */
+	#ifndef LIBRTINFO_DEBUG
+		#define LIBRTINFO_DEBUG          0              /* Enable lib debug message */
+	#endif
+	
 	#define LIBRTINFO_HDDTEMP_HOST   "127.0.0.1"    /* Should always be localhost */
 	#define LIBRTINFO_HDDTEMP_PORT   7634
 	
@@ -15,6 +18,7 @@
 	#define LIBRTINFO_DISK_FILE     "/proc/diskstats"
 	
 	#include <stdint.h>
+	#include <time.h>
 	
 	/* CPU Structures */
 	typedef struct rtinfo_cpu_time_t {
@@ -145,6 +149,7 @@
 	typedef struct rtinfo_temp_hdd_t {
 		uint16_t peak;
 		uint16_t hdd_average;
+		time_t last;
 		
 	} rtinfo_temp_hdd_t;
 
@@ -175,6 +180,8 @@
 	rtinfo_loadagv_t  *rtinfo_get_loadavg(rtinfo_loadagv_t *load);
 	rtinfo_battery_t  *rtinfo_get_battery(rtinfo_battery_t *battery, char *name);
 	rtinfo_temp_cpu_t *rtinfo_get_temp_cpu(rtinfo_temp_cpu_t *temp);
+	
+	rtinfo_temp_hdd_t *rtinfo_init_temp_hdd(rtinfo_temp_hdd_t *temp);
 	rtinfo_temp_hdd_t *rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *temp);
 	
 	/* Initialize/free network structure (required to use network) */

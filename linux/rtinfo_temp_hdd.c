@@ -27,6 +27,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <time.h>
 #include "misc.h"
 #include "rtinfo.h"
 
@@ -105,16 +106,30 @@ uint16_t __rtinfo_internal_hddtemp_parse(char *buffer, unsigned int *peak) {
 	return (disks > 0) ? value / disks : 0;
 }
 
+rtinfo_temp_hdd_t * rtinfo_init_temp_hdd(rtinfo_temp_hdd_t *hddtemp) {
+	rtinfo_debug("[+] librtinfo: hddtemp: initializing\n");
+	
+	hddtemp->peak = 0;
+	hddtemp->hdd_average = 0;
+	hddtemp->last = 0;
+	
+	return hddtemp;
+}
+
 rtinfo_temp_hdd_t * rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *hddtemp) {
 	int sockfd;
 	unsigned int peak = 0;
 	char buffer[1024];
 	size_t rlen;
 	
-	if((sockfd = __rtinfo_internal_hddtemp_connect()) < 0) {
-		hddtemp->hdd_average = 0;
+	if(hddtemp->last > time(NULL) - 300) {
+		rtinfo_debug("[+] librtinfo: hddtemp: skipping, update too soon\n");
 		return hddtemp;
 	}
+	
+	rtinfo_debug("[+] librtinfo: hddtemp: connecting\n");
+	if((sockfd = __rtinfo_internal_hddtemp_connect()) < 0)
+		return hddtemp;
 	
 	rlen = recv(sockfd, buffer, sizeof(buffer), MSG_WAITALL);
 	buffer[rlen] = '\0';
@@ -122,8 +137,11 @@ rtinfo_temp_hdd_t * rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *hddtemp) {
 	rtinfo_debug("[+] librtinfo: hddtemp: %s\n", buffer);
 	
 	hddtemp->hdd_average = __rtinfo_internal_hddtemp_parse(buffer, &peak);
-	hddtemp->peak 	     = peak;
+	hddtemp->peak = peak;
 	
+	hddtemp->last = time(NULL);
+	
+	shutdown(sockfd, SHUT_RDWR);
 	close(sockfd);
 	
 	return hddtemp;
