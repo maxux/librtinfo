@@ -72,8 +72,10 @@ int __rtinfo_internal_disk_nbdisk(char *prefix) {
 	char *match;
 	unsigned int length, nbdisk = 0;
 	
-	if(!(fp = fopen(LIBRTINFO_DISK_FILE, "r")))
-		__rtinfo_internal_diep(LIBRTINFO_DISK_FILE);
+	if(!(fp = fopen(LIBRTINFO_DISK_FILE, "r"))) {
+		fprintf(stderr, "[-] librtinfo: cannot open %s, ignoring disks\n", LIBRTINFO_DISK_FILE);
+		return 0;
+	}
 
 	/* Counting number of matching disk availble */
 	while(fgets(data, sizeof(data), fp) != NULL) {
@@ -191,6 +193,9 @@ rtinfo_disk_t *rtinfo_get_disk(rtinfo_disk_t *disk) {
 	unsigned int length;
 	rtinfo_disk_dev_t *dev;
 	char temp[32];
+	
+	if(!disk->nbdisk)
+		return disk;
 
 	if(!(fp = fopen(LIBRTINFO_DISK_FILE, "r")))
 		__rtinfo_internal_diep(LIBRTINFO_DISK_FILE);
