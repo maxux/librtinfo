@@ -35,8 +35,18 @@ typedef struct cpu_temp_t {
 
 /* should be ordered by pertinence */
 cpu_temp_t __temp_cpu[] = {
-	{.path = "/sys/devices/platform/coretemp.0/temp*_input", .multiplier = 0.001},
-	{.path = "/sys/class/thermal/thermal_zone0/temp",        .multiplier = 0.001},
+	{
+		.path = "/sys/devices/platform/coretemp.0/temp*_input",
+		.multiplier = 0.001
+	},
+	{
+		.path = "/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp*_input",
+		.multiplier = 0.001
+	},
+	{
+		.path = "/sys/class/thermal/thermal_zone0/temp",
+		.multiplier = 0.001
+	},
 };
 
 /*
