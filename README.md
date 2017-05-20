@@ -4,7 +4,7 @@ This is a small library (less than 1000 lines of C code) able to build easy-to-u
 
 # Monitoring
 
-This library can monitor:
+This library can monitor (only Linux is really supported):
 - Basic overall cpu usage
 - Basic overall memory (ram and swap) usage
 - Battery status if any
