@@ -3,8 +3,6 @@ include config.mk
 SRC=$(wildcard *.c)
 OBJ=$(SRC:.c=.o)
 
-RM  = rm -fv
-
 all: options $(EXEC)
 
 options: config.mk
@@ -20,7 +18,7 @@ $(EXEC): $(OBJ)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	$(RM) *.o
+	rm -f *.o
 
 mrproper: clean
-	$(RM) $(EXEC)
+	rm -f $(EXEC)
