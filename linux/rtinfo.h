@@ -183,7 +183,9 @@
 	
 	rtinfo_temp_hdd_t *rtinfo_init_temp_hdd(rtinfo_temp_hdd_t *temp);
 	rtinfo_temp_hdd_t *rtinfo_get_temp_hdd(rtinfo_temp_hdd_t *temp);
-	
+	rtinfo_temp_hdd_t *rtinfo_init_temp_nvme(rtinfo_temp_hdd_t *temp);
+	rtinfo_temp_hdd_t *rtinfo_get_temp_nvme(rtinfo_temp_hdd_t *temp);
+
 	/* Initialize/free network structure (required to use network) */
 	rtinfo_network_t * rtinfo_init_network();
 	void rtinfo_free_network(rtinfo_network_t *net);
