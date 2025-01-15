@@ -50,7 +50,7 @@ rtinfo_temp_hdd_t * rtinfo_get_temp_nvme(rtinfo_temp_hdd_t *hddtemp) {
 	unsigned int found = 0;
 
 	if(hddtemp->last > time(NULL) - 180) {
-		rtinfo_debug("[+] librtinfo: nvmetemp: skipping, update too soon\n");
+		rtinfo_debug("[+] librtinfo: nvmetemp: skipping, update too soon (last fetch: %ld)\n", hddtemp->last);
 		return hddtemp;
 	}
 
