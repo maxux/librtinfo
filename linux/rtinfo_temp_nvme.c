@@ -49,10 +49,15 @@ rtinfo_temp_hdd_t * rtinfo_get_temp_nvme(rtinfo_temp_hdd_t *hddtemp) {
 	double value = 0, now = 0;
 	unsigned int found = 0;
 
+	if(hddtemp->last > time(NULL) - 180) {
+		rtinfo_debug("[+] librtinfo: nvmetemp: skipping, update too soon\n");
+		return hddtemp;
+	}
+
 	/* default value */
 	hddtemp->peak = 0;
 	hddtemp->hdd_average = 0;
-    hddtemp->last = 0;
+	hddtemp->last = time(NULL);
 
 	globbuf.gl_offs = 1;
 
