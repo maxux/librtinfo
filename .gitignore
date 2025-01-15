@@ -1,0 +1,3 @@
+linux/librtinfo.a
+linux/librtinfo.so*
+linux/*.o
