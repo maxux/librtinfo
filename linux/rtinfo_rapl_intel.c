@@ -288,7 +288,7 @@ rtinfo_rapl_t *rtinfo_get_rapl_intel(rtinfo_rapl_t *rapl) {
     if(!rapl)
         return NULL;
 
-    rapl_pkg_t **pkgs = (rapl_pkg_t **)  rapl->kntxt;
+    rapl_pkg_t **pkgs = (rapl_pkg_t **) rapl->kntxt;
 
     // Continuous Power Reading
     for(size_t pkgid = 0; pkgid < rapl->zones; pkgid++) {
@@ -318,7 +318,7 @@ rtinfo_rapl_t *rtinfo_mk_rapl_usage(rtinfo_rapl_t *rapl) {
     if(!rapl)
         return NULL;
 
-    rapl_pkg_t **pkgs = (rapl_pkg_t **)  rapl->kntxt;
+    rapl_pkg_t **pkgs = (rapl_pkg_t **) rapl->kntxt;
 
     // Continuous Power Reading
     for(size_t pkgid = 0; pkgid < rapl->zones; pkgid++) {
