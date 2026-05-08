@@ -75,8 +75,8 @@ int main(void) {
 	rtinfo_get_rapl_intel(pwr);
 
 	for(i = 0; i < dsk->nbdisk; i++) {
-		printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
-		printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written, IOPS: %d\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0, dsk->dev[i].iops);
+		printf("[ ] Disk %s: %lu MiB read, %lu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
+		printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written, IOPS: %ld\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0, dsk->dev[i].iops);
 	}
 
 	rtinfo_mk_rapl_usage(pwr);
@@ -91,15 +91,15 @@ int main(void) {
 
 	printf("[I] ---\n");
 	for(i = 0; i < net->nbiface; i++)
-		printf("[ ] Network %d: %-15s | %-15s | %10llu bytes/s | %10llu bytes/s | Speed: %d Mbps\n", i, net->net[i].name, net->net[i].ip, net->net[i].up_rate, net->net[i].down_rate, net->net[i].speed);
+		printf("[ ] Network %d: %-15s | %-15s | %10lu bytes/s | %10lu bytes/s | Speed: %d Mbps\n", i, net->net[i].name, net->net[i].ip, net->net[i].up_rate, net->net[i].down_rate, net->net[i].speed);
 
 	/* Reading Memory */
 	printf("[I] ---\n");
 	if(!rtinfo_get_memory(&memory))
 		return 1;
 
-	printf("[ ] RAM : Total: %llu ko - Used: %llu ko\n", memory.ram_total, memory.ram_used);
-	printf("[ ] SWAP: Total: %llu ko - Free: %llu ko\n", memory.swap_total, memory.swap_free);
+	printf("[ ] RAM : Total: %lu ko - Used: %lu ko\n", memory.ram_total, memory.ram_used);
+	printf("[ ] SWAP: Total: %lu ko - Free: %lu ko\n", memory.swap_total, memory.swap_free);
 
 	/* Reading Load Average */
 	printf("[I] ---\n");
