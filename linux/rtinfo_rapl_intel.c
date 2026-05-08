@@ -275,8 +275,9 @@ rtinfo_rapl_t *rtinfo_init_rapl_intel() {
 
     for(size_t i = 0; i < rapl->zones; i++) {
         free(sockets.cpu_dev_msr[i]);
-        free(sockets.cpu_dev_msr);
     }
+
+    free(sockets.cpu_dev_msr);
 
     rapl->kntxt = (void **) pkgs;
 
