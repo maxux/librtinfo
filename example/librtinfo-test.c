@@ -1,4 +1,4 @@
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,6 +14,7 @@ int main(void) {
 	rtinfo_loadagv_t loadavg;
 	rtinfo_cpu_t *cpu;
 	rtinfo_disk_t *dsk;
+	rtinfo_rapl_t *pwr;
 
 	rtinfo_uptime_t uptime;
 	rtinfo_temp_cpu_t temp_cpu;
@@ -32,6 +33,10 @@ int main(void) {
 	cpu = rtinfo_init_cpu();
 	dsk = rtinfo_init_disk("sd");
 
+	if(!(pwr = rtinfo_init_rapl_intel())) {
+		printf("[-] RAPL failed, disabled\n");
+	}
+
 	/* Initialize hdd temp connection */
 	rtinfo_init_temp_hdd(&temp_hdd);
 
@@ -46,6 +51,7 @@ int main(void) {
 	rtinfo_get_cpu(cpu);
 	rtinfo_get_network(net);
 	rtinfo_get_disk(dsk);
+	rtinfo_get_rapl_intel(pwr);
 
 	/* You should while(...) { here */
 
@@ -66,9 +72,17 @@ int main(void) {
 	rtinfo_get_disk(dsk);
 	rtinfo_mk_disk_usage(dsk, UPDATE_INTERVAL / 1000);
 
+	rtinfo_get_rapl_intel(pwr);
+
 	for(i = 0; i < dsk->nbdisk; i++) {
 		printf("[ ] Disk %s: %llu MiB read, %llu MiB written\n", dsk->dev[i].name, dsk->dev[i].current.read / 1024 / 1024, dsk->dev[i].current.written / 1024 / 1024);
 		printf("[ ] Disk %s: %.2f MiB/s read, %.2f MiB/s written, IOPS: %d\n", dsk->dev[i].name, dsk->dev[i].read_speed / 1024 / 1024.0, dsk->dev[i].write_speed / 1024 / 1024.0, dsk->dev[i].iops);
+	}
+
+	rtinfo_mk_rapl_usage(pwr);
+
+	for(i = 0; i < pwr->zones; i++) {
+		printf("[ ] PKG %d: power: %f watt\n", i, pwr->pkgs[i]);
 	}
 
 	/* Reading Network */
@@ -130,6 +144,7 @@ int main(void) {
 	rtinfo_free_cpu(cpu);
 	rtinfo_free_network(net);
 	rtinfo_free_disk(dsk);
+	rtinfo_free_rapl(pwr);
 
 	return 0;
 }

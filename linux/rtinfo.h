@@ -153,6 +153,16 @@
 
 	} rtinfo_temp_hdd_t;
 
+	/* RAPL Intel */
+	typedef struct rtinfo_rapl_t {
+		size_t zones;
+		double *pkgs;
+
+		// Internal Context
+		void **kntxt;
+
+	} rtinfo_rapl_t;
+
 	/* Functions prototypes */
 
 	/* Initialize/free cpu structure (required to use CPU) */
@@ -163,17 +173,27 @@
 	rtinfo_disk_t *rtinfo_init_disk(char *prefix);
 	void rtinfo_free_disk(rtinfo_disk_t *disk);
 
+	/* Initialize/free RAPL monitor structure */
+	rtinfo_rapl_t *rtinfo_init_rapl_intel();
+	void rtinfo_free_rapl(rtinfo_rapl_t *rapl);
+
 	/* Update cpu structure */
 	rtinfo_cpu_t *rtinfo_get_cpu(rtinfo_cpu_t *cpu);
 
 	/* Update disk structure */
 	rtinfo_disk_t *rtinfo_get_disk(rtinfo_disk_t *disk);
 
+	/* Update RAPL structure */
+	rtinfo_rapl_t *rtinfo_get_rapl_intel(rtinfo_rapl_t *rapl);
+
 	/* Compute the cpu Usage in percent for each CPU */
 	rtinfo_cpu_t *rtinfo_mk_cpu_usage(rtinfo_cpu_t *cpu);
 
 	/* Compute the disk speed for each disk */
 	rtinfo_disk_t *rtinfo_mk_disk_usage(rtinfo_disk_t *disk, int timewait);
+
+	/* Compute RAPL Power Usage (timewait is saved internally) */
+	rtinfo_rapl_t *rtinfo_mk_rapl_usage(rtinfo_rapl_t *rapl);
 
 	/* Write structure with current values */
 	rtinfo_memory_t   *rtinfo_get_memory(rtinfo_memory_t *memory);
